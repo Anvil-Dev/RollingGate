@@ -6,27 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-public class RGRule<T> {
-    final String namespace;
-    final Class<T> type;
-    final RGEnvironment environment;
-    final String serialize;
-    final String[] preset;
-    final RGValidator<T> validator;
-    final T defaultValue;
-    final Field field;
-
-    public RGRule(String namespace, Class<T> type, RGEnvironment environment, String serialize, String[] preset, RGValidator<T> validator, T defaultValue, Field field) {
-        this.namespace = namespace;
-        this.type = type;
-        this.environment = environment;
-        this.serialize = serialize;
-        this.preset = preset;
-        this.validator = validator;
-        this.defaultValue = defaultValue;
-        this.field = field;
-    }
-
+public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environment, String serialize, String[] allowed,
+                        RGValidator<T> validator, T defaultValue, Field field) {
     @SuppressWarnings("unchecked")
     public static <T> @NotNull RGRule<T> of(String namespace, @NotNull Field field) {
         if (!Modifier.isStatic(field.getModifiers())) throw RGRuleException.notStatic(field.getName());
@@ -43,7 +24,7 @@ public class RGRule<T> {
                 (Class<T>) type,
                 rule.env(),
                 serialize,
-                rule.preset(),
+                rule.allowed(),
                 rule.validator().getDeclaredConstructor().newInstance(),
                 (T) field.get(null),
                 field
@@ -135,7 +116,7 @@ public class RGRule<T> {
      */
     @SuppressWarnings("unchecked")
     public void setFieldValue(JsonElement primitive) {
-        Object value = switch (field.getType().getTypeName()) {
+        Object value = switch (this.field.getType().getTypeName()) {
             case "boolean", "java.lang.Boolean" -> primitive.getAsBoolean();
             case "byte", "java.lang.Byte" -> primitive.getAsByte();
             case "short", "java.lang.Short" -> primitive.getAsShort();
@@ -145,7 +126,7 @@ public class RGRule<T> {
             case "double", "java.lang.Double" -> primitive.getAsDouble();
             case "java.lang.String" -> primitive.getAsString();
             default ->
-                    throw new RGRuleException("Field %s has unsupported type %s", field.getName(), field.getType().getTypeName());
+                throw new RGRuleException("Field %s has unsupported type %s", this.field.getName(), this.field.getType().getTypeName());
         };
         this.setFieldValue((T) value);
     }

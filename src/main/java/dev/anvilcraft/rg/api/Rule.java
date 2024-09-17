@@ -10,11 +10,11 @@ import java.lang.annotation.Target;
 public @interface Rule {
     RGEnvironment env() default RGEnvironment.SERVER;
 
-    String description() default "";
-
     String serialize() default "";
 
-    String[] preset() default {};
+    String[] allowed() default {};
+
+    String[] categories() default {};
 
     Class<? extends RGValidator> validator() default RGValidator.DefaultValidator.class;
 }
