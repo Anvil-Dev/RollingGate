@@ -1,9 +1,12 @@
 package dev.anvilcraft.rg.api;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import dev.anvilcraft.rg.RollingGate;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.storage.LevelResource;
+import net.neoforged.fml.loading.FMLPaths;
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.include.com.google.common.base.Charsets;
@@ -20,7 +23,8 @@ import java.util.Map;
 
 public class RGRuleManager {
     private static final RGRuleManager INSTANCE = new RGRuleManager();
-    private static final LevelResource path = new LevelResource("rolling_gate.json");
+    private static final Path GlobalConfigPath = FMLPaths.CONFIGDIR.get().resolve("rolling_gate.json");
+    private static final LevelResource WorldConfigPath = new LevelResource("rolling_gate.json");
     private final Map<String, RGRule<?>> rules;
 
     public RGRuleManager() {
@@ -28,12 +32,20 @@ public class RGRuleManager {
     }
 
     public static void reInitSaveRules(MinecraftServer server) {
-        Path path = server.getWorldPath(RGRuleManager.path);
-        JsonObject config = getOrCreateContent(path);
-        config.entrySet().forEach((entry) -> {
+        Path path = server.getWorldPath(RGRuleManager.WorldConfigPath);
+        setSaveRules(getOrCreateContent(GlobalConfigPath));
+        setSaveRules(getOrCreateContent(path));
+    }
+
+    private static void setSaveRules(JsonObject config) {
+        for (Map.Entry<String, JsonElement> entry : config.entrySet()) {
             RGRule<?> rule = INSTANCE.rules.get(entry.getKey());
-            if (rule != null) rule.setFieldValue(entry.getValue());
-        });
+            if (rule == null) {
+                RollingGate.LOGGER.warn("{}({}) not exist.", entry.getKey(), entry.getValue());
+                continue;
+            }
+            rule.setFieldValue(entry.getValue());
+        }
     }
 
     public void register(RGRule<?> rule) {

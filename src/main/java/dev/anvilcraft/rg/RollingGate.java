@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 @Mod(RollingGate.MODID)
 public class RollingGate {
     public static final String MODID = "rolling_gate";
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     public RollingGate(IEventBus modEventBus, ModContainer modContainer) {
         NeoForge.EVENT_BUS.addListener((ServerStartingEvent event) -> RGRuleManager.reInitSaveRules(event.getServer()));
