@@ -125,4 +125,24 @@ public class RGRule<T> {
             throw new RGRuleException("Illegal value: %s", value);
         }
     }
+
+    /**
+     * 获取规则的名称翻译键
+     *
+     * @return 返回格式化的名称翻译键字符串，包括命名空间和序列化字段
+     */
+    public @NotNull String getNameTranslationKey() {
+        // 使用formatted方法格式化名称翻译键
+        return "%s.rolling_gate.rule.%s".formatted(this.namespace, this.serialize);
+    }
+
+    /**
+     * 获取规则的描述翻译键
+     *
+     * @return 返回格式化的描述翻译键字符串，包括命名空间和序列化字段
+     */
+    public @NotNull String getDescriptionTranslationKey() {
+        // 使用String.format方法构建描述翻译键，包含命名空间和序列化值
+        return "%s.rolling_gate.rule.%s.desc".formatted(this.namespace, this.serialize);
+    }
 }
