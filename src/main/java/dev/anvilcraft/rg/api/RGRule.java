@@ -1,5 +1,7 @@
 package dev.anvilcraft.rg.api;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
@@ -130,5 +132,28 @@ public class RGRule<T> {
         } catch (IllegalAccessException e) {
             throw new RGRuleException("Illegal value: %s", value);
         }
+    }
+
+    /**
+     * 设置字段的值
+     *
+     * @param primitive 要设置的字段json值
+     * @throws RGRuleException 当值无法被设置时抛出异常
+     */
+    @SuppressWarnings("unchecked")
+    public void setFieldValue(JsonElement primitive) {
+        Object value = switch (field.getType().getTypeName()) {
+            case "boolean", "java.lang.Boolean" -> primitive.getAsBoolean();
+            case "byte", "java.lang.Byte" -> primitive.getAsByte();
+            case "short", "java.lang.Short" -> primitive.getAsShort();
+            case "int", "java.lang.Integer" -> primitive.getAsInt();
+            case "long", "java.lang.Long" -> primitive.getAsLong();
+            case "float", "java.lang.Float" -> primitive.getAsFloat();
+            case "double", "java.lang.Double" -> primitive.getAsDouble();
+            case "java.lang.String" -> primitive.getAsString();
+            default ->
+                    throw new RGRuleException("Field %s has unsupported type %s", field.getName(), field.getType().getTypeName());
+        };
+        this.setFieldValue((T) value);
     }
 }
