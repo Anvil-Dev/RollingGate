@@ -118,10 +118,19 @@
 * Write a class implement `dev.anvilcraft.rg.api.RGAdditional`
 
 ```java
+@Mod("your_mod_id")
+public class YourMod {
+    public YourMod(IEventBus modEventBus, @NotNull ModContainer modContainer) {
+        modContainer.registerExtensionPoint(RGAdditional.class, new YourAdditional());
+    }
+}
+
 public class YourAdditional implements RGAdditional {
     @Override
     public void loadRules(@NotNull RGRuleManager manager) {
         manager.register(YourRules.class);
+        TranslationUtil.loadLanguage(YourMod.class, "your_mod_id", "zh_cn");
+        TranslationUtil.loadLanguage(YourMod.class, "your_mod_id", "en_us");
     }
 }
 ```
@@ -132,13 +141,15 @@ public class YourAdditional implements RGAdditional {
 ```java
 @Mod('your_mod_id')
 public class YourMod implements RGAdditional {
-    public YourMod(IEventBus modEventBus, ModContainer modContainer) {
-        // ...
+    public YourMod(IEventBus modEventBus, @NotNull ModContainer modContainer) {
+        modContainer.registerExtensionPoint(RGAdditional.class, this);
     }
 
     @Override
     public void loadRules(@NotNull RGRuleManager manager) {
         manager.register(YourRules.class);
+        TranslationUtil.loadLanguage(YourMod.class, "your_mod_id", "zh_cn");
+        TranslationUtil.loadLanguage(YourMod.class, "your_mod_id", "en_us");
     }
 }
 ```

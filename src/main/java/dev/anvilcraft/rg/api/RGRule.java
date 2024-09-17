@@ -125,8 +125,7 @@ public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environme
             case "float", "java.lang.Float" -> primitive.getAsFloat();
             case "double", "java.lang.Double" -> primitive.getAsDouble();
             case "java.lang.String" -> primitive.getAsString();
-            default ->
-                throw new RGRuleException("Field %s has unsupported type %s", this.field.getName(), this.field.getType().getTypeName());
+            default -> throw new RGRuleException("Field %s has unsupported type %s", this.field.getName(), this.field.getType().getTypeName());
         };
         this.setFieldValue((T) value);
     }

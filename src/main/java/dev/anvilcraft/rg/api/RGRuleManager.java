@@ -63,4 +63,14 @@ public class RGRuleManager {
         }
         return ruleList;
     }
+
+    /**
+     * 获取分组翻译键
+     *
+     * @return 返回格式化的分组翻译键字符串
+     */
+    public @NotNull String getDescriptionCategoryKey(String category) {
+        // 使用String.format方法构建描述翻译键，包含命名空间和序列化值
+        return "rolling_gate.category.%s".formatted(category);
+    }
 }

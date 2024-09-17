@@ -3,6 +3,6 @@ package dev.anvilcraft.rg;
 import dev.anvilcraft.rg.api.Rule;
 
 public class RollingGateRules {
-    @Rule(allowed = {"true", "false"}, categories = {RollingGateCategories.DISABLED})
-    public static final boolean antiCheatDisabled = false;
+    @Rule(allowed = {"zh_cn", "en_us"}, categories = {RollingGateCategories.DISABLED})
+    public static final String language = "zh_cn";
 }

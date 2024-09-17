@@ -3,6 +3,7 @@ package dev.anvilcraft.rg;
 import com.mojang.logging.LogUtils;
 import dev.anvilcraft.rg.api.RGAdditional;
 import dev.anvilcraft.rg.api.RGRuleManager;
+import dev.anvilcraft.rg.util.TranslationUtil;
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -26,11 +27,14 @@ public class RollingGate implements RGAdditional {
     public RollingGate(@NotNull IEventBus modEventBus, ModContainer modContainer) {
         NeoForge.EVENT_BUS.addListener(this::reInitRules);
         modEventBus.addListener(this::loadRGRules);
+        modContainer.registerExtensionPoint(RGAdditional.class, this);
     }
 
     @Override
     public void loadRules(@NotNull RGRuleManager manager) {
         manager.register(RollingGateRules.class);
+        TranslationUtil.loadLanguage(RollingGate.class, "rolling_gate", "zh_cn");
+        TranslationUtil.loadLanguage(RollingGate.class, "rolling_gate", "en_us");
     }
 
     @SubscribeEvent
