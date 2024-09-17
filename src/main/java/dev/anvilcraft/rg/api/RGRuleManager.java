@@ -37,7 +37,7 @@ public class RGRuleManager {
     }
 
     public void register(RGRule<?> rule) {
-        this.rules.put(rule.serialize, rule);
+        this.rules.put(rule.namespace, rule);
     }
 
     private static JsonObject getOrCreateContent(Path path) {
