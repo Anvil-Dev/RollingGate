@@ -1,13 +1,13 @@
 package dev.anvilcraft.rg.api;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 public class RGRule<T> {
+    final String namespace;
     final Class<T> type;
     final RGEnvironment environment;
     final String serialize;
@@ -17,6 +17,7 @@ public class RGRule<T> {
     final Field field;
 
     public RGRule(String namespace, Class<T> type, RGEnvironment environment, String serialize, String[] preset, RGValidator<T> validator, T defaultValue, Field field) {
+        this.namespace = namespace;
         this.type = type;
         this.environment = environment;
         this.serialize = serialize;
@@ -28,20 +29,12 @@ public class RGRule<T> {
 
     @SuppressWarnings("unchecked")
     public static <T> @NotNull RGRule<T> of(String namespace, @NotNull Field field) {
-        if (!Modifier.isStatic(field.getModifiers())) {
-            throw new RuntimeException("Field %s is not static".formatted(field.getName()));
-        }
-        if (!Modifier.isPublic(field.getModifiers())) {
-            throw new RuntimeException("Field %s is not public".formatted(field.getName()));
-        }
-        if (!Modifier.isFinal(field.getModifiers())) {
-            throw new RuntimeException("Field %s can't be final".formatted(field.getName()));
-        }
+        if (!Modifier.isStatic(field.getModifiers())) throw RGRuleException.notStatic(field.getName());
+        if (!Modifier.isPublic(field.getModifiers())) throw RGRuleException.notPublic(field.getName());
+        if (Modifier.isFinal(field.getModifiers())) throw RGRuleException.beFinal(field.getName());
         Class<?> type = RGRule.checkType(field);
         Rule rule = field.getAnnotation(Rule.class);
-        if (rule == null) {
-            throw new RuntimeException("Field %s is not annotated with @Rule".formatted(field.getName()));
-        }
+        if (rule == null) throw RGRuleException.notAnnotated(field.getName());
         String serialize = rule.serialize().isEmpty() ? RGRule.caseToSnake(field.getName()) : rule.serialize();
         RGRule.checkSerialize(serialize);
         try {
@@ -56,7 +49,7 @@ public class RGRule<T> {
                 field
             );
         } catch (Exception e) {
-            throw new RuntimeException("Failed to create rule for field %s".formatted(field.getName()), e);
+            throw RGRuleException.createRuleFailed(field.getName());
         }
     }
 
@@ -82,7 +75,7 @@ public class RGRule<T> {
             case "float", "java.lang.Float" -> Float.class;
             case "double", "java.lang.Double" -> Double.class;
             case "java.lang.String" -> String.class;
-            default -> throw new RGRuleException("Field %s has unsupported type %s", field.getName(), field.getType().getTypeName());
+            default -> throw RGRuleException.unsupportedType(field.getName(), field.getType());
         };
     }
 
@@ -155,5 +148,25 @@ public class RGRule<T> {
                     throw new RGRuleException("Field %s has unsupported type %s", field.getName(), field.getType().getTypeName());
         };
         this.setFieldValue((T) value);
+    }
+
+    /**
+     * 获取规则的名称翻译键
+     *
+     * @return 返回格式化的名称翻译键字符串，包括命名空间和序列化字段
+     */
+    public @NotNull String getNameTranslationKey() {
+        // 使用formatted方法格式化名称翻译键
+        return "%s.rolling_gate.rule.%s".formatted(this.namespace, this.serialize);
+    }
+
+    /**
+     * 获取规则的描述翻译键
+     *
+     * @return 返回格式化的描述翻译键字符串，包括命名空间和序列化字段
+     */
+    public @NotNull String getDescriptionTranslationKey() {
+        // 使用String.format方法构建描述翻译键，包含命名空间和序列化值
+        return "%s.rolling_gate.rule.%s.desc".formatted(this.namespace, this.serialize);
     }
 }
