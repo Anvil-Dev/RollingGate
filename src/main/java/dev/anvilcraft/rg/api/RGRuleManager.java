@@ -1,16 +1,25 @@
 package dev.anvilcraft.rg.api;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import dev.anvilcraft.rg.RollingGate;
+import dev.anvilcraft.rg.util.ConfigUtil;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.level.storage.LevelResource;
+import net.neoforged.fml.loading.FMLPaths;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class RGRuleManager {
+    private static final Path GlobalConfigPath = FMLPaths.CONFIGDIR.get().resolve("rolling_gate.json");
+    private static final LevelResource WorldConfigPath = new LevelResource("rolling_gate.json");
     private final Map<String, RGRule<?>> rules;
     private String namespace = "rolling_gate";
 
@@ -18,11 +27,21 @@ public class RGRuleManager {
         this.rules = new HashMap<>();
     }
 
-    public void reInit(@NotNull JsonObject config) {
-        config.entrySet().forEach((entry) -> {
+    public void reInit(@NotNull MinecraftServer server) {
+        this.setSaveRules(ConfigUtil.getOrCreateContent(GlobalConfigPath));
+        Path path = server.getWorldPath(WorldConfigPath);
+        this.setSaveRules(ConfigUtil.getOrCreateContent(path));
+    }
+
+    private void setSaveRules(JsonObject config) {
+        for (Map.Entry<String, JsonElement> entry : config.entrySet()) {
             RGRule<?> rule = this.rules.get(entry.getKey());
-            if (rule != null) rule.setFieldValue(entry.getValue());
-        });
+            if (rule == null) {
+                RollingGate.LOGGER.warn("{}({}) not exist.", entry.getKey(), entry.getValue());
+                continue;
+            }
+            rule.setFieldValue(entry.getValue());
+        }
     }
 
     public void register(Class<?> rules) {
