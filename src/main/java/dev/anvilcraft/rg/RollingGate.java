@@ -3,10 +3,9 @@ package dev.anvilcraft.rg;
 import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
 import dev.anvilcraft.rg.api.RGAdditional;
-import dev.anvilcraft.rg.api.RGRuleException;
 import dev.anvilcraft.rg.api.RGRuleManager;
+import dev.anvilcraft.rg.util.ConfigUtil;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.storage.LevelResource;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -16,13 +15,9 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
-import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
-import org.spongepowered.include.com.google.common.base.Charsets;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -56,21 +51,7 @@ public class RollingGate implements RGAdditional {
     public void reInitRules(@NotNull ServerStartingEvent event) {
         MinecraftServer server = event.getServer();
         Path path = server.getWorldPath(RollingGate.RULE_PATH);
-        JsonObject config = getOrCreateContent(path);
+        JsonObject config = ConfigUtil.getOrCreateContent(path);
         RollingGate.RULE_MANAGER.reInit(config);
-    }
-
-    private static @NotNull JsonObject getOrCreateContent(@NotNull Path path) {
-        File file = path.toFile();
-        try {
-            if (!file.exists() || file.isDirectory()) {
-                FileUtils.writeStringToFile(file, "{}", Charsets.UTF_8);
-                return new JsonObject();
-            }
-            String value = FileUtils.readFileToString(path.toFile(), Charsets.UTF_8);
-            return GsonHelper.parse(value);
-        } catch (IOException e) {
-            throw new RGRuleException("Failed to read rolling gate config file", e);
-        }
     }
 }
