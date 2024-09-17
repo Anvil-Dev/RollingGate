@@ -29,7 +29,7 @@ import java.util.Optional;
 @Mod(RollingGate.MODID)
 public class RollingGate implements RGAdditional {
     public static final String MODID = "rolling_gate";
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
     private static final RGRuleManager RULE_MANAGER = new RGRuleManager();
     private static final LevelResource RULE_PATH = new LevelResource("rolling_gate.json");
 
