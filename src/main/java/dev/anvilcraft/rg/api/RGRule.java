@@ -114,4 +114,21 @@ public class RGRule<T> {
         // 使用正则表达式匹配驼峰命名法中的大写字母，并在其前添加下划线，然后将整个字符串转换为小写
         return str.replaceAll("([a-z])([A-Z]+)", "$1_$2").toLowerCase();
     }
+
+    /**
+     * 设置字段的值
+     *
+     * @param value 要设置的字段值
+     * @throws RGRuleException 当值无法被设置时抛出异常
+     */
+    @SuppressWarnings("unchecked")
+    public void setFieldValue(T value) {
+        try {
+            if (this.validator.validate((T) this.field.get(null), value)) {
+                this.field.set(null, value);
+            }
+        } catch (IllegalAccessException e) {
+            throw new RGRuleException("Illegal value: %s", value);
+        }
+    }
 }
