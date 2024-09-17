@@ -71,25 +71,17 @@ public class RGRule<T> {
      * @throws RuntimeException 当字段的类型不被支持时抛出
      */
     public static Class<?> checkType(@NotNull Field field) {
-        // 检查并转换字段类型，从基本数据类型开始
-        if (field.getType() == boolean.class) return Boolean.class;
-        if (field.getType() == Boolean.class) return Boolean.class;
-        if (field.getType() == byte.class) return Byte.class;
-        if (field.getType() == Byte.class) return Byte.class;
-        if (field.getType() == short.class) return Short.class;
-        if (field.getType() == Short.class) return Short.class;
-        if (field.getType() == int.class) return Integer.class;
-        if (field.getType() == Integer.class) return Integer.class;
-        if (field.getType() == long.class) return Long.class;
-        if (field.getType() == Long.class) return Long.class;
-        if (field.getType() == float.class) return Float.class;
-        if (field.getType() == Float.class) return Float.class;
-        if (field.getType() == double.class) return Double.class;
-        if (field.getType() == Double.class) return Double.class;
-        // 支持String类型
-        if (field.getType() == String.class) return String.class;
-        // 对于不支持的类型，抛出异常
-        throw new RuntimeException("Field %s has unsupported type %s".formatted(field.getName(), field.getType()));
+        return switch (field.getType().getTypeName()) {
+            case "boolean", "java.lang.Boolean" -> Boolean.class;
+            case "byte", "java.lang.Byte" -> Byte.class;
+            case "short", "java.lang.Short" -> Short.class;
+            case "int", "java.lang.Integer" -> Integer.class;
+            case "long", "java.lang.Long" -> Long.class;
+            case "float", "java.lang.Float" -> Float.class;
+            case "double", "java.lang.Double" -> Double.class;
+            case "java.lang.String" -> String.class;
+            default -> throw new RGRuleException("Field %s has unsupported type %s", field.getName(), field.getType().getTypeName());
+        };
     }
 
 
