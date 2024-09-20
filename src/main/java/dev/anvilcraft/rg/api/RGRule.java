@@ -1,6 +1,7 @@
 package dev.anvilcraft.rg.api;
 
 import com.google.gson.JsonElement;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
@@ -158,7 +159,7 @@ public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environme
         return "%s.rolling_gate.rule.%s.desc".formatted(this.namespace, this.serialize);
     }
 
-    @NotNull RequiredArgumentBuilder<CommandSourceStack, T> getCommandArgumentBuilder() {
-        return Commands.argument("value", StringArgumentType.of(this));
+    @NotNull RequiredArgumentBuilder<CommandSourceStack, ?> getCommandArgumentBuilder() {
+        return Commands.argument("value", StringArgumentType.string());
     }
 }

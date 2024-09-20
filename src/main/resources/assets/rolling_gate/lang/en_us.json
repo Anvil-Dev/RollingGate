@@ -4,5 +4,7 @@
 
   "rolling_gate.category.disabled": "DISABLED",
 
-  "rolling_gate.reload.success": "Reload Success!"
+  "rolling_gate.command.root.version": "Version: %s",
+  "rolling_gate.command.root.reload.success": "Reload Success!",
+  "rolling_gate.command.root.not_found": "Not found mod by id: %s"
 }

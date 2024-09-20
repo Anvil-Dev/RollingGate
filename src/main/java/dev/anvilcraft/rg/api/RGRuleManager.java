@@ -11,9 +11,16 @@ import dev.anvilcraft.rg.util.TranslationUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.neoforgespi.language.IModInfo;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
@@ -23,17 +30,21 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class RGRuleManager {
     private final Path globalConfigPath;
     private final LevelResource worldConfigPath;
     private final Map<String, RGRule<?>> rules;
     private String namespace = "rolling_gate";
+    private final String managerNamespace;
+    private final List<String> categories = new ArrayList<>();
 
     public RGRuleManager(String namespace, @NotNull RGEnvironment environment) {
         this.rules = new HashMap<>();
         this.globalConfigPath = FMLPaths.CONFIGDIR.get().resolve("%s%s.json".formatted(namespace, environment.isClient() ? "_client" : ""));
         this.worldConfigPath = new LevelResource("%s%s.json".formatted(namespace, environment.isClient() ? "_client" : ""));
+        this.managerNamespace = namespace;
     }
 
     public void reInit(@NotNull MinecraftServer server) {
@@ -53,8 +64,13 @@ public class RGRuleManager {
         }
     }
 
+    public void addRule(@NotNull RGRule<?> rule) {
+        this.rules.put(rule.serialize(), rule);
+        this.categories.addAll(Arrays.asList(rule.categories()));
+    }
+
     public void register(Class<?> rules) {
-        RGRuleManager.of(this.namespace, rules).forEach(rule -> this.rules.put(rule.serialize(), rule));
+        RGRuleManager.of(this.namespace, rules).forEach(this::addRule);
     }
 
     public void setNamespace(String namespace) {
@@ -136,8 +152,27 @@ public class RGRuleManager {
         root.then(setDefault);
     }
 
-    int menuCommand(CommandContext<CommandSourceStack> context) {
-        return 1;
+    int menuCommand(@NotNull CommandContext<CommandSourceStack> context) {
+        String command = context.getInput();
+        Optional<? extends ModContainer> container = ModList.get().getModContainerById(this.managerNamespace);
+        if (container.isPresent()) {
+            IModInfo info = container.get().getModInfo();
+            context.getSource().sendSuccess(() -> Component.literal(info.getDisplayName()).withStyle(ChatFormatting.DARK_BLUE), false);
+            context.getSource().sendSuccess(() -> TranslationUtil.trans("rolling_gate.command.root.version", info.getVersion().toString()).withStyle(ChatFormatting.GRAY), false);
+            MutableComponent categories = Component.empty();
+            for (String category : this.categories) {
+                MutableComponent categoryComponent = Component.empty();
+                categoryComponent.append("[");
+                categoryComponent.append(TranslationUtil.trans(this.getDescriptionCategoryKey(category)));
+                categoryComponent.append("] ");
+                categories.append(categoryComponent.withStyle(ChatFormatting.BLUE));
+                categories.withStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/%s category %s".formatted(command, category))));
+            }
+            context.getSource().sendSuccess(() -> categories, false);
+            return 1;
+        }
+        context.getSource().sendFailure(TranslationUtil.trans("rolling_gate.command.root.not_found", this.managerNamespace).withStyle(ChatFormatting.RED));
+        return 0;
     }
 
     int listCommand(CommandContext<CommandSourceStack> context) {
@@ -149,6 +184,9 @@ public class RGRuleManager {
     }
 
     int categoryCommand(CommandContext<CommandSourceStack> context, String category) {
+        this.rules.values().stream().filter(rule -> Arrays.asList(rule.categories()).contains(category)).forEach(rule -> {
+            context.getSource().sendSuccess(() -> TranslationUtil.trans(rule.getNameTranslationKey()), false);
+        });
         return 1;
     }
 

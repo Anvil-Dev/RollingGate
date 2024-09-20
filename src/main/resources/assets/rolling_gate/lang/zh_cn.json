@@ -4,5 +4,7 @@
 
   "rolling_gate.category.disabled": "禁用类",
 
-  "rolling_gate.reload.success": "重载成功!"
+  "rolling_gate.command.root.version": "版本: %s",
+  "rolling_gate.command.root.reload.success": "重载成功!",
+  "rolling_gate.command.root.not_found": "未找到此 ID 的模组: %s"
 }
