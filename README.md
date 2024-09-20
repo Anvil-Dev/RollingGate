@@ -48,7 +48,7 @@
     * `reload` - 重新加载配置文件
     * `list` - 列出所有修改过的规则
         * `[rule]` - 查看规则的详细信息
-        * `category [category]` - 查看分组下的所有规则
+    * `category [category]` - 查看分组下的所有规则
     * `set [rule] [value]` - 设置规则的值
     * `default [rule] [value]` - 设置当前存档的规则默认值
 
@@ -56,7 +56,7 @@
     * `reload` - Reload configuration file
     * `list` - List all modified rules
         * `[rule]` - View detailed information of rules
-        * `category [category]` - View all rules under the group
+    * `category [category]` - View all rules under the group
     * `set [rule] [value]` - Set the value of the rule
     * `default [rule] [value]` - Set default rules for the current save
 

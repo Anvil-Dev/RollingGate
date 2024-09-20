@@ -1,12 +1,18 @@
 package dev.anvilcraft.rg.api;
 
 import com.google.gson.JsonElement;
+import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environment, String serialize, String[] allowed,
+public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environment, String[] categories,
+                        String serialize, String[] allowed,
                         RGValidator<T> validator, T defaultValue, Field field) {
     @SuppressWarnings("unchecked")
     public static <T> @NotNull RGRule<T> of(String namespace, @NotNull Field field) {
@@ -23,6 +29,7 @@ public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environme
                 namespace,
                 (Class<T>) type,
                 rule.env(),
+                rule.categories(),
                 serialize,
                 rule.allowed(),
                 rule.validator().getDeclaredConstructor().newInstance(),
@@ -125,7 +132,8 @@ public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environme
             case "float", "java.lang.Float" -> primitive.getAsFloat();
             case "double", "java.lang.Double" -> primitive.getAsDouble();
             case "java.lang.String" -> primitive.getAsString();
-            default -> throw new RGRuleException("Field %s has unsupported type %s", this.field.getName(), this.field.getType().getTypeName());
+            default ->
+                throw new RGRuleException("Field %s has unsupported type %s", this.field.getName(), this.field.getType().getTypeName());
         };
         this.setFieldValue((T) value);
     }
@@ -148,5 +156,9 @@ public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environme
     public @NotNull String getDescriptionTranslationKey() {
         // 使用String.format方法构建描述翻译键，包含命名空间和序列化值
         return "%s.rolling_gate.rule.%s.desc".formatted(this.namespace, this.serialize);
+    }
+
+    @NotNull RequiredArgumentBuilder<CommandSourceStack, T> getCommandArgumentBuilder() {
+        return Commands.argument("value", StringArgumentType.of(this));
     }
 }

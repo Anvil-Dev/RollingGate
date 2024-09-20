@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dev.anvilcraft.rg.RollingGate;
 import dev.anvilcraft.rg.RollingGateRules;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -16,11 +17,7 @@ public class TranslationUtil {
     public static final Gson GSON = new Gson();
     public static final Map<String, Map<String, String>> LANGUAGES = new HashMap<>();
 
-    public static @NotNull String trans(String key) {
-        return LANGUAGES.getOrDefault(RollingGateRules.language, new HashMap<>()).getOrDefault(key, key);
-    }
-
-    public static @NotNull Component trans(String key, Object... args) {
+    public static @NotNull MutableComponent trans(String key, Object... args) {
         return Component.translatableWithFallback(
             key,
             LANGUAGES.getOrDefault(RollingGateRules.language, new HashMap<>())

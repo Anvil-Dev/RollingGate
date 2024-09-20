@@ -2,5 +2,7 @@
   "rolling_gate.rolling_gate.rule.language": "语言",
   "rolling_gate.rolling_gate.rule.language.desc": "设置卷帘门的默认语言",
 
-  "rolling_gate.category.disabled": "禁用类"
+  "rolling_gate.category.disabled": "禁用类",
+
+  "rolling_gate.reload.success": "重载成功!"
 }
