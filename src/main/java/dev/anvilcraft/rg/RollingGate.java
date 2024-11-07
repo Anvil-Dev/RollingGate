@@ -5,6 +5,7 @@ import dev.anvilcraft.rg.api.client.ClientRGRuleManager;
 import dev.anvilcraft.rg.api.RGAdditional;
 import dev.anvilcraft.rg.api.server.ServerRGRuleManager;
 import dev.anvilcraft.rg.api.server.TranslationUtil;
+import dev.anvilcraft.rg.client.RollingGateClientRules;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -24,7 +25,6 @@ public class RollingGate implements RGAdditional {
     public static final String MODID = "rolling_gate";
     public static final Logger LOGGER = LogUtils.getLogger();
     private static final ServerRGRuleManager SERVER_RULE_MANAGER = new ServerRGRuleManager(RollingGate.MODID);
-    private static final ClientRGRuleManager CLIENT_RULE_MANAGER = new ClientRGRuleManager(RollingGate.MODID);
 
     public RollingGate(@NotNull IEventBus modEventBus, @NotNull ModContainer modContainer) {
         modEventBus.addListener(this::onLoadComplete);
@@ -51,9 +51,7 @@ public class RollingGate implements RGAdditional {
             RollingGate.SERVER_RULE_MANAGER.setNamespace(modId);
             Optional<RGAdditional> additional = modContainer.getCustomExtension(RGAdditional.class);
             additional.ifPresent(add -> add.loadServerRules(RollingGate.SERVER_RULE_MANAGER));
-            additional.ifPresent(add -> add.loadClientRules(RollingGate.CLIENT_RULE_MANAGER));
         });
-        RollingGate.CLIENT_RULE_MANAGER.reInit();
     }
 
     @SubscribeEvent
