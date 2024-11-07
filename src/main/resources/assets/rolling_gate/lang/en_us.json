@@ -5,6 +5,11 @@
   "rolling_gate.category.disabled": "DISABLED",
 
   "rolling_gate.command.root.version": "Version: %s",
-  "rolling_gate.command.root.reload.success": "Reload Success!",
-  "rolling_gate.command.root.not_found": "Not found mod by id: %s"
+  "rolling_gate.command.reload.success": "Reload Success!",
+  "rolling_gate.command.rule.select.hover": "Click to select the value",
+  "rolling_gate.command.rule.set": "The value of rule %s has been set to %s",
+  "rolling_gate.command.rule.set.default.button": "SET AS DEFAULT",
+  "rolling_gate.command.rule.set.default": "The value of rule %s has been set to %s by default",
+  "rolling_gate.command.root.not_found": "Not found mod by id: %s",
+  "rolling_gate.command.exception.not_exist": "Rule %s is not exist"
 }

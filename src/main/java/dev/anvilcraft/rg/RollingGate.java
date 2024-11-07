@@ -1,13 +1,10 @@
 package dev.anvilcraft.rg;
 
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.logging.LogUtils;
 import dev.anvilcraft.rg.api.RGAdditional;
 import dev.anvilcraft.rg.api.RGEnvironment;
 import dev.anvilcraft.rg.api.RGRuleManager;
 import dev.anvilcraft.rg.util.TranslationUtil;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -60,11 +57,6 @@ public class RollingGate implements RGAdditional {
 
     @SubscribeEvent
     public void registerCommand(@NotNull RegisterCommandsEvent event) {
-        LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal(MODID);
-        LiteralArgumentBuilder<CommandSourceStack> root2 = Commands.literal("rg");
-        RollingGate.RULE_MANAGER.generateCommand(root);
-        RollingGate.RULE_MANAGER.generateCommand(root2);
-        event.getDispatcher().register(root);
-        event.getDispatcher().register(root2);
+        RollingGate.RULE_MANAGER.generateCommand(event.getDispatcher(), MODID, "rg");
     }
 }

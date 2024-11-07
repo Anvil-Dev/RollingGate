@@ -5,6 +5,11 @@
   "rolling_gate.category.disabled": "禁用类",
 
   "rolling_gate.command.root.version": "版本: %s",
-  "rolling_gate.command.root.reload.success": "重载成功!",
-  "rolling_gate.command.root.not_found": "未找到此 ID 的模组: %s"
+  "rolling_gate.command.reload.success": "重载成功!",
+  "rolling_gate.command.rule.select.hover": "点击选择该值",
+  "rolling_gate.command.rule.set": "规则 %s 的值已设置为 %s",
+  "rolling_gate.command.rule.set.default.button": "设为默认",
+  "rolling_gate.command.rule.set.default": "规则 %s 的值已默认设置为 %s",
+  "rolling_gate.command.root.not_found": "未找到此 ID 的模组: %s",
+  "rolling_gate.command.exception.not_exist": "规则 %s 不存在"
 }

@@ -11,6 +11,10 @@ public class RGRuleException extends RuntimeException {
         super(msg, e);
     }
 
+    public static @NotNull RGRuleException illegalAccess(@NotNull String name) {
+        return new RGRuleException("Field %s has illegal access", name);
+    }
+
     public static @NotNull RGRuleException notStatic(@NotNull String name) {
         return new RGRuleException("Field %s is not static", name);
     }

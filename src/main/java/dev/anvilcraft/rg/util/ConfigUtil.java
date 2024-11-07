@@ -12,7 +12,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 public class ConfigUtil {
-
     public static @NotNull JsonObject getOrCreateContent(@NotNull Path path) {
         File file = path.toFile();
         try {
@@ -27,4 +26,11 @@ public class ConfigUtil {
         }
     }
 
+    public static void writeContent(@NotNull Path path, @NotNull String content) {
+        try {
+            FileUtils.writeStringToFile(path.toFile(), content, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RGRuleException("Failed to write rolling gate config file", e);
+        }
+    }
 }

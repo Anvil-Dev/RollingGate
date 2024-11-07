@@ -1,30 +1,64 @@
 package dev.anvilcraft.rg.api;
 
 import com.google.gson.JsonElement;
-import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.builder.ArgumentBuilder;
-import com.mojang.brigadier.builder.RequiredArgumentBuilder;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
-import org.jetbrains.annotations.Contract;
+import dev.anvilcraft.rg.RollingGate;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environment, String[] categories,
                         String serialize, String[] allowed,
-                        RGValidator<T> validator, T defaultValue, Field field) {
+                        List<RGValidator<T>> validators, T defaultValue, Field field, RGCodec<T> codec) {
+    public static final Map<String, RGCodec<?>> CODECS = new HashMap<>() {{
+        put("java.lang.Boolean", RGCodec.BOOLEAN);
+        put("boolean", RGCodec.BOOLEAN);
+        put("java.lang.Byte", RGCodec.BYTE);
+        put("byte", RGCodec.BYTE);
+        put("java.lang.Short", RGCodec.SHORT);
+        put("short", RGCodec.SHORT);
+        put("java.lang.Integer", RGCodec.INTEGER);
+        put("int", RGCodec.INTEGER);
+        put("java.lang.Long", RGCodec.LONG);
+        put("long", RGCodec.LONG);
+        put("java.lang.Float", RGCodec.FLOAT);
+        put("float", RGCodec.FLOAT);
+        put("java.lang.Double", RGCodec.DOUBLE);
+        put("double", RGCodec.DOUBLE);
+        put("java.lang.String", RGCodec.STRING);
+    }};
+
     @SuppressWarnings("unchecked")
     public static <T> @NotNull RGRule<T> of(String namespace, @NotNull Field field) {
-        if (!Modifier.isStatic(field.getModifiers())) throw RGRuleException.notStatic(field.getName());
-        if (!Modifier.isPublic(field.getModifiers())) throw RGRuleException.notPublic(field.getName());
-        if (Modifier.isFinal(field.getModifiers())) throw RGRuleException.beFinal(field.getName());
+        String name = field.getName();
+        if (!Modifier.isStatic(field.getModifiers())) throw RGRuleException.notStatic(name);
+        if (!Modifier.isPublic(field.getModifiers())) throw RGRuleException.notPublic(name);
+        if (Modifier.isFinal(field.getModifiers())) throw RGRuleException.beFinal(name);
         Class<?> type = RGRule.checkType(field);
         Rule rule = field.getAnnotation(Rule.class);
-        if (rule == null) throw RGRuleException.notAnnotated(field.getName());
-        String serialize = rule.serialize().isEmpty() ? RGRule.caseToSnake(field.getName()) : rule.serialize();
+        if (rule == null) throw RGRuleException.notAnnotated(name);
+        String serialize = rule.serialize().isEmpty() ? RGRule.caseToSnake(name) : rule.serialize();
         RGRule.checkSerialize(serialize);
+        List<RGValidator<T>> validators = new ArrayList<>();
+        for (Class<?> validator : rule.validator()) {
+            try {
+                validators.add((RGValidator<T>) validator.getDeclaredConstructor().newInstance());
+            } catch (Exception e) {
+                RollingGate.LOGGER.error(e.getMessage(), e);
+            }
+        }
+        RGCodec<?> rgCodec = RGRule.CODECS.getOrDefault(type.getTypeName(), null);
+        if (rgCodec == null) {
+            throw RGRuleException.unsupportedType(name, type);
+        } else if (rgCodec.clazz() == Boolean.class) {
+            validators.add((RGValidator<T>) new RGValidator.BooleanValidator());
+        } else if (rgCodec.clazz() == String.class && validators.isEmpty()) {
+            validators.add((RGValidator<T>) new RGValidator.StringValidator());
+        }
         try {
             return new RGRule<>(
                 namespace,
@@ -33,12 +67,26 @@ public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environme
                 rule.categories(),
                 serialize,
                 rule.allowed(),
-                rule.validator().getDeclaredConstructor().newInstance(),
+                validators,
                 (T) field.get(null),
-                field
+                field,
+                (RGCodec<T>) rgCodec
             );
         } catch (Exception e) {
-            throw RGRuleException.createRuleFailed(field.getName());
+            throw RGRuleException.createRuleFailed(name);
+        }
+    }
+
+    public @NotNull String name() {
+        return this.field.getName();
+    }
+
+    @SuppressWarnings("unchecked")
+    public T getValue() {
+        try {
+            return (T) this.field.get(null);
+        } catch (IllegalAccessException e) {
+            throw RGRuleException.illegalAccess(this.name());
         }
     }
 
@@ -55,17 +103,9 @@ public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environme
      * @throws RuntimeException 当字段的类型不被支持时抛出
      */
     public static Class<?> checkType(@NotNull Field field) {
-        return switch (field.getType().getTypeName()) {
-            case "boolean", "java.lang.Boolean" -> Boolean.class;
-            case "byte", "java.lang.Byte" -> Byte.class;
-            case "short", "java.lang.Short" -> Short.class;
-            case "int", "java.lang.Integer" -> Integer.class;
-            case "long", "java.lang.Long" -> Long.class;
-            case "float", "java.lang.Float" -> Float.class;
-            case "double", "java.lang.Double" -> Double.class;
-            case "java.lang.String" -> String.class;
-            default -> throw RGRuleException.unsupportedType(field.getName(), field.getType());
-        };
+        RGCodec<?> rgCodec = CODECS.getOrDefault(field.getType().getTypeName(), null);
+        if (rgCodec != null) return rgCodec.clazz();
+        throw RGRuleException.unsupportedType(field.getName(), field.getType());
     }
 
 
@@ -106,11 +146,14 @@ public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environme
      * @throws RGRuleException 当值无法被设置时抛出异常
      */
     @SuppressWarnings("unchecked")
-    public void setFieldValue(T value) {
+    public void setFieldValue(String value) {
         try {
-            if (this.validator.validate((T) this.field.get(null), value)) {
-                this.field.set(null, value);
+            for (RGValidator<T> validator : this.validators) {
+                if (!validator.validate((T) this.field.get(null), value)) {
+                    throw new RGRuleException("Illegal value: %s, reason: %s", value, validator.reason());
+                }
             }
+            this.field.set(null, this.codec.decode(value));
         } catch (IllegalAccessException e) {
             throw new RGRuleException("Illegal value: %s", value);
         }
@@ -122,21 +165,15 @@ public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environme
      * @param primitive 要设置的字段json值
      * @throws RGRuleException 当值无法被设置时抛出异常
      */
-    @SuppressWarnings("unchecked")
     public void setFieldValue(JsonElement primitive) {
-        Object value = switch (this.field.getType().getTypeName()) {
-            case "boolean", "java.lang.Boolean" -> primitive.getAsBoolean();
-            case "byte", "java.lang.Byte" -> primitive.getAsByte();
-            case "short", "java.lang.Short" -> primitive.getAsShort();
-            case "int", "java.lang.Integer" -> primitive.getAsInt();
-            case "long", "java.lang.Long" -> primitive.getAsLong();
-            case "float", "java.lang.Float" -> primitive.getAsFloat();
-            case "double", "java.lang.Double" -> primitive.getAsDouble();
-            case "java.lang.String" -> primitive.getAsString();
-            default ->
-                throw new RGRuleException("Field %s has unsupported type %s", this.field.getName(), this.field.getType().getTypeName());
-        };
-        this.setFieldValue((T) value);
+        RGCodec<?> rgCodec = CODECS.getOrDefault(this.field.getType().getTypeName(), null);
+        if (rgCodec != null) {
+            if (primitive.isJsonPrimitive() && primitive.getAsJsonPrimitive().isString()) {
+                this.setFieldValue(primitive.getAsString());
+            } else this.setFieldValue(primitive.toString());
+            return;
+        }
+        throw new RGRuleException("Field %s has unsupported type %s", this.name(), this.field.getType().getTypeName());
     }
 
     /**
@@ -157,9 +194,5 @@ public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environme
     public @NotNull String getDescriptionTranslationKey() {
         // 使用String.format方法构建描述翻译键，包含命名空间和序列化值
         return "%s.rolling_gate.rule.%s.desc".formatted(this.namespace, this.serialize);
-    }
-
-    @NotNull RequiredArgumentBuilder<CommandSourceStack, ?> getCommandArgumentBuilder() {
-        return Commands.argument("value", StringArgumentType.string());
     }
 }

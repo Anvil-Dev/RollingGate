@@ -16,5 +16,5 @@ public @interface Rule {
 
     String[] categories() default {};
 
-    Class<? extends RGValidator> validator() default RGValidator.DefaultValidator.class;
+    Class<? extends RGValidator>[] validator() default {};
 }
