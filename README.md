@@ -46,18 +46,16 @@
 
 * `/rg` - 显示模组控制面板
     * `reload` - 重新加载配置文件
-    * `list` - 列出所有修改过的规则
-        * `[rule]` - 查看规则的详细信息
     * `category [category]` - 查看分组下的所有规则
-    * `set [rule] [value]` - 设置规则的值
+    * `[rule] [value]` - 设置规则的值
+    * `[rule]` - 查看规则详细介绍
     * `default [rule] [value]` - 设置当前存档的规则默认值
 
 * `/rg` - Display mod control panel
     * `reload` - Reload configuration file
-    * `list` - List all modified rules
-        * `[rule]` - View detailed information of rules
     * `category [category]` - View all rules under the group
-    * `set [rule] [value]` - Set the value of the rule
+    * `[rule] [value]` - Set the value of the rule
+    * `[rule]` - View detailed information of rules
     * `default [rule] [value]` - Set default rules for the current save
 
 ## 规则 | Rules
@@ -118,6 +116,7 @@
 * Write a class implement `dev.anvilcraft.rg.api.RGAdditional`
 
 ```java
+
 @Mod("your_mod_id")
 public class YourMod {
     public YourMod(IEventBus modEventBus, @NotNull ModContainer modContainer) {
@@ -127,10 +126,15 @@ public class YourMod {
 
 public class YourAdditional implements RGAdditional {
     @Override
-    public void loadRules(@NotNull RGRuleManager manager) {
-        manager.register(YourRules.class);
+    public void loadServerRules(@NotNull ServerRGRuleManager manager) {
+        manager.register(YourServerRules.class);
         TranslationUtil.loadLanguage(YourMod.class, "your_mod_id", "zh_cn");
         TranslationUtil.loadLanguage(YourMod.class, "your_mod_id", "en_us");
+    }
+
+    @Override
+    public void loadClientRules(@NotNull ClientRGRuleManager manager) {
+        manager.register(YourClientRules.class);
     }
 }
 ```
@@ -139,6 +143,7 @@ public class YourAdditional implements RGAdditional {
 * You can also enable your mod main class to implement `dev.anvilcraft.rg.api.RGAdditional`
 
 ```java
+
 @Mod('your_mod_id')
 public class YourMod implements RGAdditional {
     public YourMod(IEventBus modEventBus, @NotNull ModContainer modContainer) {
@@ -146,10 +151,15 @@ public class YourMod implements RGAdditional {
     }
 
     @Override
-    public void loadRules(@NotNull RGRuleManager manager) {
-        manager.register(YourRules.class);
+    public void loadServerRules(@NotNull RGRuleManager manager) {
+        manager.register(YourServerRules.class);
         TranslationUtil.loadLanguage(YourMod.class, "your_mod_id", "zh_cn");
         TranslationUtil.loadLanguage(YourMod.class, "your_mod_id", "en_us");
+    }
+
+    @Override
+    public void loadClientRules(@NotNull ClientRGRuleManager manager) {
+        manager.register(YourClientRules.class);
     }
 }
 ```
