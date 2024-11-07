@@ -1,7 +1,6 @@
-package dev.anvilcraft.rg.util;
+package dev.anvilcraft.rg.api;
 
 import com.google.gson.JsonObject;
-import dev.anvilcraft.rg.api.RGRuleException;
 import net.minecraft.util.GsonHelper;
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;

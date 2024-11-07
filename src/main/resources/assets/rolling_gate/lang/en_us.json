@@ -2,6 +2,7 @@
   "rolling_gate.rolling_gate.rule.language": "Language",
   "rolling_gate.rolling_gate.rule.language.desc": "Set the default language for RollingGate",
 
+  "rolling_gate.category.base": "BASE",
   "rolling_gate.category.disabled": "DISABLED",
 
   "rolling_gate.command.root.version": "Version: %s",

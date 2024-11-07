@@ -1,8 +1,8 @@
-package dev.anvilcraft.rg.util;
+package dev.anvilcraft.rg.api.server;
 
 import com.google.gson.Gson;
 import dev.anvilcraft.rg.RollingGate;
-import dev.anvilcraft.rg.RollingGateRules;
+import dev.anvilcraft.rg.RollingGateServerRules;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +20,7 @@ public class TranslationUtil {
     public static @NotNull MutableComponent trans(String key, Object... args) {
         return Component.translatableWithFallback(
             key,
-            LANGUAGES.getOrDefault(RollingGateRules.language, new HashMap<>())
+            LANGUAGES.getOrDefault(RollingGateServerRules.language, new HashMap<>())
                 .getOrDefault(key, key)
                 .formatted(args),
             args
