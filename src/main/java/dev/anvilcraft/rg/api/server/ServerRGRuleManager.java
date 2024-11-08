@@ -35,20 +35,47 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * 服务器端RGRule管理器类，继承自RGRuleManager
+ * 用于管理服务器端的规则，包括规则的设置、重新初始化以及命令生成
+ */
 public class ServerRGRuleManager extends RGRuleManager {
+    // 世界配置文件路径
     private final LevelResource worldConfigPath;
+    // 用于存储世界特定规则配置的映射
     private final Map<RGRule<?>, Object> worldConfig = new HashMap<>();
 
+    /**
+     * 构造函数
+     * 初始化ServerRGRuleManager实例，设置其命名空间和环境为服务器端
+     *
+     * @param namespace 命名空间，用于标识规则管理器
+     */
     public ServerRGRuleManager(String namespace) {
         super(namespace, RGEnvironment.SERVER);
         this.worldConfigPath = new LevelResource("%s.json".formatted(namespace));
     }
 
+    /**
+     * 设置世界配置
+     * 将指定规则的值存储到世界配置中，并更新配置文件
+     *
+     * @param server 服务器实例，用于访问世界路径
+     * @param rule   要设置的规则
+     * @param value  规则的值
+     * @param <T>    规则值的类型
+     */
     public <T> void setWorldConfig(@NotNull MinecraftServer server, @NotNull RGRule<T> rule, T value) {
         this.worldConfig.put(rule, value);
         ConfigUtil.writeContent(server.getWorldPath(worldConfigPath), GSON.toJson(this.getSerializedConfig(this.worldConfig)));
     }
 
+    /**
+     * 重新初始化世界配置
+     * 清空当前世界配置，并从配置文件中重新加载配置
+     *
+     * @param server 服务器实例，用于访问世界路径
+     */
     public void reInit(@NotNull MinecraftServer server) {
         super.reInit();
         this.worldConfig.clear();
@@ -59,15 +86,31 @@ public class ServerRGRuleManager extends RGRuleManager {
         }
     }
 
+    /**
+     * 生成命令
+     * 根据提供的字面量在命令调度器中注册命令
+     *
+     * @param dispatcher 命令调度器，用于注册命令
+     * @param literal    命令的字面量
+     */
     @SuppressWarnings("unused")
     public void generateCommand(CommandDispatcher<CommandSourceStack> dispatcher, @NotNull String literal) {
         this.generateCommand(dispatcher, literal, null);
     }
 
+    /**
+     * 生成命令
+     * 根据提供的字面量和重定向路径在命令调度器中注册命令
+     *
+     * @param dispatcher 命令调度器，用于注册命令
+     * @param literal    命令的字面量
+     * @param redirect   命令的重定向路径，可以为null
+     */
     @SuppressWarnings("unused")
     public void generateCommand(CommandDispatcher<CommandSourceStack> dispatcher, @NotNull String literal, String redirect) {
         new Command(dispatcher, literal, redirect).generateCommand();
     }
+
 
     private class Command {
         @NotNull CommandDispatcher<CommandSourceStack> dispatcher;
@@ -80,7 +123,7 @@ public class ServerRGRuleManager extends RGRuleManager {
             this.redirect = redirect;
         }
 
-        public void generateCommand() {
+        private void generateCommand() {
             LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal(literal)
                 .requires(this::checkPermission)
                 .executes(this::listCommand)

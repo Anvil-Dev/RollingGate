@@ -14,9 +14,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * RGRule类用于定义和管理配置规则它是一个泛型记录类，用于存储配置项的相关信息和操作逻辑
+ *
+ * @param <T> 配置项的类型
+ */
 public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environment, String[] categories,
                         String serialize, String[] allowed,
                         List<RGValidator<T>> validators, T defaultValue, Field field, RGCodec<T> codec) {
+
+    /**
+     * CODECS映射用于存储支持的类型及其对应的编解码器
+     */
     public static final Map<String, RGCodec<?>> CODECS = new HashMap<>() {{
         put("java.lang.Boolean", RGCodec.BOOLEAN);
         put("boolean", RGCodec.BOOLEAN);
@@ -35,18 +44,32 @@ public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environme
         put("java.lang.String", RGCodec.STRING);
     }};
 
+    /**
+     * 创建一个新的RGRule实例
+     *
+     * @param namespace 命名空间，用于区分不同的配置范围
+     * @param field     配置项对应的Field对象
+     * @param <T>       配置项的类型
+     * @return 新创建的RGRule实例
+     * @throws RGRuleException 如果配置项不合法或不支持，则抛出此异常
+     */
     @SuppressWarnings("unchecked")
     public static <T> @NotNull RGRule<T> of(String namespace, @NotNull Field field) {
         String name = field.getName();
+        // 检查配置项是否是静态的
         if (!Modifier.isStatic(field.getModifiers())) throw RGRuleException.notStatic(name);
+        // 检查配置项是否是公开的
         if (!Modifier.isPublic(field.getModifiers())) throw RGRuleException.notPublic(name);
+        // 检查配置项是否不是final的
         if (Modifier.isFinal(field.getModifiers())) throw RGRuleException.beFinal(name);
         Class<?> type = RGRule.checkType(field);
         Rule rule = field.getAnnotation(Rule.class);
+        // 确保配置项上有Rule注解
         if (rule == null) throw RGRuleException.notAnnotated(name);
         String serialize = rule.serialize().isEmpty() ? RGRule.caseToSnake(name) : rule.serialize();
         RGRule.checkSerialize(serialize);
         List<RGValidator<T>> validators = new ArrayList<>();
+        // 实例化所有验证器
         for (Class<?> validator : rule.validator()) {
             try {
                 validators.add((RGValidator<T>) validator.getDeclaredConstructor().newInstance());
@@ -55,11 +78,14 @@ public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environme
             }
         }
         RGCodec<?> rgCodec = RGRule.CODECS.getOrDefault(type.getTypeName(), null);
+        // 确保类型支持
         if (rgCodec == null) {
             throw RGRuleException.unsupportedType(name, type);
         } else if (rgCodec.clazz() == Boolean.class) {
+            // 为Boolean类型添加默认验证器
             validators.add((RGValidator<T>) new RGValidator.BooleanValidator());
         } else if (rgCodec.clazz() == String.class && validators.isEmpty()) {
+            // 为String类型添加默认验证器
             validators.add((RGValidator<T>) new RGValidator.StringValidator());
         }
         try {
@@ -80,10 +106,21 @@ public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environme
         }
     }
 
+    /**
+     * 获取配置项的名称
+     *
+     * @return 配置项的名称
+     */
     public @NotNull String name() {
         return this.field.getName();
     }
 
+    /**
+     * 获取配置项的当前值
+     *
+     * @return 配置项的值
+     * @throws RGRuleException 如果无法访问配置项的值，则抛出此异常
+     */
     @SuppressWarnings("unchecked")
     public T getValue() {
         try {
@@ -92,6 +129,7 @@ public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environme
             throw RGRuleException.illegalAccess(this.name());
         }
     }
+
 
     /**
      * 检查并转换字段的类型
