@@ -1,9 +1,13 @@
 {
+  "rolling_gate.category.base": "BASE",
+  "rolling_gate.category.creative": "CREATIVE",
+  "rolling_gate.category.disabled": "DISABLED",
+
   "rolling_gate.rolling_gate.rule.language": "Language",
   "rolling_gate.rolling_gate.rule.language.desc": "Set the default language for RollingGate",
 
-  "rolling_gate.category.base": "BASE",
-  "rolling_gate.category.disabled": "DISABLED",
+  "rolling_gate.rolling_gate.rule.view_distance": "View Distance",
+  "rolling_gate.rolling_gate.rule.view_distance.desc": "Set the default view distance for server",
 
   "rolling_gate.command.root.version": "Version: %s",
   "rolling_gate.command.reload.success": "Reload Success!",

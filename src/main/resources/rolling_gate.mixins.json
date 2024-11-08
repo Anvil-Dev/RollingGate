@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "rolling_gate.refmap.json",
   "mixins": [
+    "server.DedicatedServerAccessor"
   ],
   "client": [
   ],

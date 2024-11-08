@@ -1,9 +1,13 @@
 {
+  "rolling_gate.category.base": "基础",
+  "rolling_gate.category.creative": "创造",
+  "rolling_gate.category.disabled": "禁用类",
+
   "rolling_gate.rolling_gate.rule.language": "语言",
   "rolling_gate.rolling_gate.rule.language.desc": "设置卷帘门的默认语言",
 
-  "rolling_gate.category.base": "基础",
-  "rolling_gate.category.disabled": "禁用类",
+  "rolling_gate.rolling_gate.rule.view_distance": "视距",
+  "rolling_gate.rolling_gate.rule.view_distance.desc": "设置服务器的默认视距",
 
   "rolling_gate.command.root.version": "版本: %s",
   "rolling_gate.command.reload.success": "重载成功!",

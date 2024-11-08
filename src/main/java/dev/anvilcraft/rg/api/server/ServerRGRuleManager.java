@@ -125,7 +125,7 @@ public class ServerRGRuleManager extends RGRuleManager {
         private void listCommand(LiteralArgumentBuilder<CommandSourceStack> builder, TriFunction<CommandContext<CommandSourceStack>, RGRule<?>, String, Integer> execute, boolean list) {
             for (Map.Entry<String, RGRule<?>> entry : rules.entrySet()) {
                 RGRule<?> rgRule = entry.getValue();
-                LiteralArgumentBuilder<CommandSourceStack> keyNode = Commands.literal(entry.getKey());
+                LiteralArgumentBuilder<CommandSourceStack> keyNode = Commands.literal(rgRule.name());
                 if (list) keyNode.executes(ctx -> this.ruleInfoCommand(ctx, rgRule));
                 for (String value : rgRule.allowed()) {
                     keyNode.then(Commands.literal(value).executes(ctx -> execute.apply(ctx, rgRule, value)));
@@ -152,8 +152,12 @@ public class ServerRGRuleManager extends RGRuleManager {
                     categoryComponent.append("[");
                     categoryComponent.append(TranslationUtil.trans(getDescriptionCategoryKey(category)));
                     categoryComponent.append("] ");
-                    categoriesComponent.append(categoryComponent.withStyle(ChatFormatting.AQUA));
-                    categoriesComponent.withStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/%s category %s".formatted(literal, category))));
+                    categoryComponent.withStyle(
+                        Style.EMPTY
+                            .applyFormat(ChatFormatting.AQUA)
+                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/%s category %s".formatted(literal, category)))
+                    );
+                    categoriesComponent.append(categoryComponent);
                 }
                 context.getSource().sendSuccess(() -> categoriesComponent, false);
                 return 1;
@@ -174,8 +178,19 @@ public class ServerRGRuleManager extends RGRuleManager {
             MutableComponent result = Component.empty();
             for (String string : rule.allowed()) {
                 if (!string.equals(rule.allowed()[0])) result.append(" ");
-                //noinspection unchecked
-                boolean isGlobalDefault = string.equals(rule.codec().encode((T) worldConfig.get(rule)));
+                Object worldDefault = worldConfig.get(rule);
+                Object globalDefault = globalConfig.get(rule);
+                T ruleDefault = rule.defaultValue();
+                boolean isGlobalDefault;
+                if (worldDefault != null) {
+                    //noinspection unchecked
+                    isGlobalDefault = string.equals(rule.codec().encode((T) worldDefault));
+                } else if (globalDefault != null) {
+                    //noinspection unchecked
+                    isGlobalDefault = string.equals(rule.codec().encode((T) globalDefault));
+                } else {
+                    isGlobalDefault = string.equals(rule.codec().encode(ruleDefault));
+                }
                 boolean isSelect = string.equals(rule.codec().encode(rule.getValue()));
                 MutableComponent component = Component.literal("[%s]".formatted(string));
                 Style style = Style.EMPTY;
@@ -197,6 +212,8 @@ public class ServerRGRuleManager extends RGRuleManager {
 
         private int categoryCommand(@NotNull CommandContext<CommandSourceStack> context) {
             String category = StringArgumentType.getString(context, "category");
+            MutableComponent categoryComponent = TranslationUtil.trans(getDescriptionCategoryKey(category)).append(":");
+            context.getSource().sendSuccess(() -> categoryComponent, false);
             for (RGRule<?> rule : rules.values()) {
                 if (Arrays.stream(rule.categories()).noneMatch(s -> s.equals(category))) continue;
                 MutableComponent component = Component.literal("- ");

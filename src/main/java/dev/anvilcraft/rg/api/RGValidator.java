@@ -2,10 +2,7 @@ package dev.anvilcraft.rg.api;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("unused")
 public interface RGValidator<T> {
@@ -39,188 +36,60 @@ public interface RGValidator<T> {
         }
     }
 
-    abstract class ValidatorFactory<T> {
-        public abstract Class<? extends RGValidator<T>> get();
+    abstract class NumberValidator<T extends Number> implements RGValidator<Integer> {
+        public abstract @NotNull Map.Entry<T, T> getRange();
 
-
-        private static class ByteValidatorFactory extends ValidatorFactory<Byte> {
-            private final byte min;
-            private final byte max;
-
-            private ByteValidatorFactory(byte min, byte max) {
-                this.min = min;
-                this.max = max;
-            }
-
-            public Class<? extends RGValidator<Byte>> get() {
-                return RangeValidator.class;
-            }
-
-            public class RangeValidator implements RGValidator<Byte> {
-                @Override
-                public boolean validate(@NotNull Byte oldValue, @NotNull String newValue) {
-                    try {
-                        byte value = Byte.parseByte(newValue);
-                        return value >= min && value <= max;
-                    } catch (NumberFormatException e) {
-                        return false;
-                    }
-                }
-
-                @Override
-                public String reason() {
-                    return "The input value must be between " + min + " and " + max + "!";
-                }
+        @Override
+        public boolean validate(@NotNull Integer oldValue, @NotNull String newValue) {
+            try {
+                T value = parse(newValue);
+                return value.doubleValue() >= getRange().getKey().doubleValue() && value.doubleValue() <= getRange().getValue().doubleValue();
+            } catch (NumberFormatException e) {
+                return false;
             }
         }
 
-
-        private static class ShortValidatorFactory extends ValidatorFactory<Short> {
-            private final short min;
-            private final short max;
-
-            private ShortValidatorFactory(short min, short max) {
-                this.min = min;
-                this.max = max;
-            }
-
-            public Class<? extends RGValidator<Short>> get() {
-                return RangeValidator.class;
-            }
-
-            public class RangeValidator implements RGValidator<Short> {
-                @Override
-                public boolean validate(@NotNull Short oldValue, @NotNull String newValue) {
-                    try {
-                        short value = Short.parseShort(newValue);
-                        return value >= min && value <= max;
-                    } catch (NumberFormatException e) {
-                        return false;
-                    }
-                }
-
-                @Override
-                public String reason() {
-                    return "The input value must be between " + min + " and " + max + "!";
-                }
-            }
+        @Override
+        public String reason() {
+            return "The input value must be between " + getRange().getKey().toString() + " and " + getRange().getValue().toString() + "!";
         }
 
-        private static class IntValidatorFactory extends ValidatorFactory<Integer> {
-            private final int min;
-            private final int max;
+        protected abstract T parse(@NotNull String newValue);
+    }
 
-            private IntValidatorFactory(int min, int max) {
-                this.min = min;
-                this.max = max;
-            }
-
-            public Class<? extends RGValidator<Integer>> get() {
-                return RangeValidator.class;
-            }
-
-            public class RangeValidator implements RGValidator<Integer> {
-                @Override
-                public boolean validate(@NotNull Integer oldValue, @NotNull String newValue) {
-                    try {
-                        int value = Integer.parseInt(newValue);
-                        return value >= min && value <= max;
-                    } catch (NumberFormatException e) {
-                        return false;
-                    }
-                }
-
-                @Override
-                public String reason() {
-                    return "The input value must be between " + min + " and " + max + "!";
-                }
-            }
+    abstract class ByteValidator extends NumberValidator<Byte> {
+        protected Byte parse(@NotNull String newValue) {
+            return Byte.parseByte(newValue);
         }
+    }
 
-
-        private static class LongValidatorFactory extends ValidatorFactory<Long> {
-            private final long min;
-            private final long max;
-
-            private LongValidatorFactory(long min, long max) {
-                this.min = min;
-                this.max = max;
-            }
-
-            public Class<? extends RGValidator<Long>> get() {
-                return RangeValidator.class;
-            }
-
-            public class RangeValidator implements RGValidator<Long> {
-                @Override
-                public boolean validate(@NotNull Long oldValue, @NotNull String newValue) {
-                    try {
-                        long value = Long.parseLong(newValue);
-                        return value >= min && value <= max;
-                    } catch (NumberFormatException e) {
-                        return false;
-                    }
-                }
-
-                @Override
-                public String reason() {
-                    return "The input value must be between " + min + " and " + max + "!";
-                }
-            }
+    abstract class ShortValidator extends NumberValidator<Short> {
+        protected Short parse(@NotNull String newValue) {
+            return Short.parseShort(newValue);
         }
+    }
 
-
-        private static class StringValidatorFactory extends ValidatorFactory<String> {
-            private final List<String> accept;
-
-            private StringValidatorFactory(String... accept) {
-                this.accept = Arrays.asList(accept);
-            }
-
-            private StringValidatorFactory(Collection<String> accept) {
-                this.accept = new ArrayList<>(accept);
-            }
-
-            public Class<? extends RGValidator<String>> get() {
-                return RangeValidator.class;
-            }
-
-            public class RangeValidator implements RGValidator<String> {
-                @Override
-                public boolean validate(@NotNull String oldValue, @NotNull String newValue) {
-                    if (newValue.isEmpty()) return false;
-                    return accept.contains(newValue);
-                }
-
-                @Override
-                public String reason() {
-                    return "The input value must be one of %s!".formatted(accept);
-                }
-            }
+    abstract class IntegerValidator extends NumberValidator<Integer> {
+        protected Integer parse(@NotNull String newValue) {
+            return Integer.parseInt(newValue);
         }
+    }
 
-        public static @NotNull Class<? extends RGValidator<Byte>> rangeByte(byte min, byte max) {
-            return new ByteValidatorFactory(min, max).get();
+    abstract class LongValidator extends NumberValidator<Long> {
+        protected Long parse(@NotNull String newValue) {
+            return Long.parseLong(newValue);
         }
+    }
 
-        public static @NotNull Class<? extends RGValidator<Short>> rangeShort(short min, short max) {
-            return new ShortValidatorFactory(min, max).get();
+    abstract class FloatValidator extends NumberValidator<Float> {
+        protected Float parse(@NotNull String newValue) {
+            return Float.parseFloat(newValue);
         }
+    }
 
-        public static @NotNull Class<? extends RGValidator<Integer>> rangeInt(int min, int max) {
-            return new IntValidatorFactory(min, max).get();
-        }
-
-        public static @NotNull Class<? extends RGValidator<Long>> rangeLong(long min, long max) {
-            return new LongValidatorFactory(min, max).get();
-        }
-
-        public static @NotNull Class<? extends RGValidator<String>> rangeString(String... accept) {
-            return new StringValidatorFactory(accept).get();
-        }
-
-        public static @NotNull Class<? extends RGValidator<String>> rangeString(Collection<String> accept) {
-            return new StringValidatorFactory(accept).get();
+    abstract class DoubleValidator extends NumberValidator<Double> {
+        protected Double parse(@NotNull String newValue) {
+            return Double.parseDouble(newValue);
         }
     }
 }

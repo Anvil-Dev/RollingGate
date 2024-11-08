@@ -2,6 +2,9 @@ package dev.anvilcraft.rg.api;
 
 import com.google.gson.JsonElement;
 import dev.anvilcraft.rg.RollingGate;
+import dev.anvilcraft.rg.api.event.RGRuleChangeEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
@@ -153,7 +156,15 @@ public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environme
                     throw new RGRuleException("Illegal value: %s, reason: %s", value, validator.reason());
                 }
             }
-            this.field.set(null, this.codec.decode(value));
+            RGRuleChangeEvent<T> event;
+            if (this.environment().isServer()) {
+                event = new RGRuleChangeEvent.Server<>(this, this.getValue(), this.codec.decode(value), ServerLifecycleHooks.getCurrentServer());
+            } else {
+                event = new RGRuleChangeEvent.Client<>(this, this.getValue(), this.codec.decode(value));
+            }
+            NeoForge.EVENT_BUS.post(event);
+            if (event.isCanceled()) return;
+            this.field.set(null, event.getNewValue());
         } catch (IllegalAccessException e) {
             throw new RGRuleException("Illegal value: %s", value);
         }
