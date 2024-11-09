@@ -10,6 +10,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.anvilcraft.rg.api.ConfigUtil;
 import dev.anvilcraft.rg.api.RGEnvironment;
 import dev.anvilcraft.rg.api.RGRule;
+import dev.anvilcraft.rg.api.RGRuleException;
 import dev.anvilcraft.rg.api.RGRuleManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
@@ -274,30 +275,40 @@ public class ServerRGRuleManager extends RGRuleManager {
         }
 
         private <T> int setRuleCommand(@NotNull CommandContext<CommandSourceStack> context, @NotNull RGRule<T> rule, String value) {
-            rule.setFieldValue(value);
-            MutableComponent result = TranslationUtil
-                .trans("rolling_gate.command.rule.set", rule.name(), value)
-                .withStyle(ChatFormatting.GRAY);
-            MutableComponent setDefault = Component.literal("[")
-                .append(TranslationUtil
-                    .trans("rolling_gate.command.rule.set.default.button", rule.name(), value))
-                .append("]")
-                .withStyle(Style.EMPTY
-                    .applyFormat(ChatFormatting.AQUA)
-                    .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/%s default %s %s".formatted(literal, rule.name(), value)))
-                );
-            result.append(" ").append(setDefault);
-            context.getSource().sendSuccess(() -> result, false);
-            return 1;
+            try {
+                rule.setFieldValue(value);
+                MutableComponent result = TranslationUtil
+                    .trans("rolling_gate.command.rule.set", rule.name(), value)
+                    .withStyle(ChatFormatting.GRAY);
+                MutableComponent setDefault = Component.literal("[")
+                    .append(TranslationUtil
+                        .trans("rolling_gate.command.rule.set.default.button", rule.name(), value))
+                    .append("]")
+                    .withStyle(Style.EMPTY
+                        .applyFormat(ChatFormatting.AQUA)
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/%s default %s %s".formatted(literal, rule.name(), value)))
+                    );
+                result.append(" ").append(setDefault);
+                context.getSource().sendSuccess(() -> result, false);
+                return 1;
+            } catch (RGRuleException exception) {
+                context.getSource().sendFailure(Component.literal(exception.getMessage()).withStyle(ChatFormatting.RED));
+                return 0;
+            }
         }
 
         private <T> int defaultRuleCommand(@NotNull CommandContext<CommandSourceStack> context, @NotNull RGRule<T> rule, String value) {
-            setWorldConfig(context.getSource().getServer(), rule, rule.codec().decode(value));
-            MutableComponent result = TranslationUtil
-                .trans("rolling_gate.command.rule.set.default", rule.name(), value)
-                .withStyle(ChatFormatting.GRAY);
-            context.getSource().sendSuccess(() -> result, false);
-            return 1;
+            try {
+                setWorldConfig(context.getSource().getServer(), rule, rule.codec().decode(value));
+                MutableComponent result = TranslationUtil
+                    .trans("rolling_gate.command.rule.set.default", rule.name(), value)
+                    .withStyle(ChatFormatting.GRAY);
+                context.getSource().sendSuccess(() -> result, false);
+                return 1;
+            } catch (RGRuleException exception) {
+                context.getSource().sendFailure(Component.literal(exception.getMessage()).withStyle(ChatFormatting.RED));
+                return 0;
+            }
         }
     }
 }
