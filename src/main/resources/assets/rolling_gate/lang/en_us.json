@@ -9,6 +9,9 @@
   "rolling_gate.rolling_gate.rule.view_distance": "View Distance",
   "rolling_gate.rolling_gate.rule.view_distance.desc": "Set the default view distance for server",
 
+  "rolling_gate.rolling_gate.rule.simulation_distance": "Simulation Distance",
+  "rolling_gate.rolling_gate.rule.simulation_distance.desc": "Set the default simulation distance for server",
+
   "rolling_gate.command.root.version": "Version: %s",
   "rolling_gate.command.reload.success": "Reload Success!",
   "rolling_gate.command.rule.select.hover": "Click to select the value",

@@ -13,8 +13,10 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * RollingGate规则管理器，负责处理和存储规则配置
@@ -35,7 +37,7 @@ public class RGRuleManager {
     // 默认命名空间
     protected String namespace = "rolling_gate";
     // 存储规则类别的列表
-    protected final List<String> categories = new ArrayList<>();
+    protected final Set<String> categories = new HashSet<>();
 
     // 静态代码块，初始化Gson实例
     static {

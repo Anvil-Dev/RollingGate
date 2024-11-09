@@ -9,6 +9,9 @@
   "rolling_gate.rolling_gate.rule.view_distance": "视距",
   "rolling_gate.rolling_gate.rule.view_distance.desc": "设置服务器的默认视距",
 
+  "rolling_gate.rolling_gate.rule.simulation_distance": "模拟距离",
+  "rolling_gate.rolling_gate.rule.simulation_distance.desc": "设置服务器的模拟距离",
+
   "rolling_gate.command.root.version": "版本: %s",
   "rolling_gate.command.reload.success": "重载成功!",
   "rolling_gate.command.rule.select.hover": "点击选择该值",

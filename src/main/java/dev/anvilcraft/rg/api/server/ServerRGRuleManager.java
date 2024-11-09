@@ -170,9 +170,11 @@ public class ServerRGRuleManager extends RGRuleManager {
                 RGRule<?> rgRule = entry.getValue();
                 LiteralArgumentBuilder<CommandSourceStack> keyNode = Commands.literal(rgRule.name());
                 if (list) keyNode.executes(ctx -> this.ruleInfoCommand(ctx, rgRule));
-                for (String value : rgRule.allowed()) {
-                    keyNode.then(Commands.literal(value).executes(ctx -> execute.apply(ctx, rgRule, value)));
-                }
+                keyNode.then(
+                    Commands.argument("value", StringArgumentType.word())
+                        .suggests((context, builder1) -> SharedSuggestionProvider.suggest(rgRule.allowed(), builder1))
+                        .executes(context -> execute.apply(context, rgRule, StringArgumentType.getString(context, "value")))
+                );
                 builder.then(keyNode);
             }
         }

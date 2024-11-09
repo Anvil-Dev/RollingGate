@@ -23,4 +23,11 @@ public class RollingGateServerRules {
         validator = ViewDistanceValidator.class
     )
     public static int viewDistance = 0;
+
+    @Rule(
+        allowed = {"0", "12", "16", "32"},
+        categories = RollingGateCategories.CREATIVE,
+        validator = ViewDistanceValidator.class
+    )
+    public static int simulationDistance = 0;
 }
