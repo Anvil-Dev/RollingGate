@@ -30,4 +30,11 @@ public class RollingGateServerRules {
         validator = ViewDistanceValidator.class
     )
     public static int simulationDistance = 0;
+
+    @Rule(
+        allowed = {"true", "false"},
+        categories = RollingGateCategories.EXPERIMENTAL,
+        validator = RGValidator.BooleanValidator.class
+    )
+    public static boolean welcomePlayer = false;
 }

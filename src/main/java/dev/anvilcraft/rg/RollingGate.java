@@ -1,11 +1,20 @@
 package dev.anvilcraft.rg;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.mojang.logging.LogUtils;
 import dev.anvilcraft.rg.api.client.ClientRGRuleManager;
 import dev.anvilcraft.rg.api.RGAdditional;
 import dev.anvilcraft.rg.api.server.ServerRGRuleManager;
 import dev.anvilcraft.rg.api.server.TranslationUtil;
 import dev.anvilcraft.rg.client.RollingGateClientRules;
+import dev.anvilcraft.rg.tools.WelcomeMessage;
+import dev.anvilcraft.rg.tools.serializer.ChatFormattingSerializer;
+import dev.anvilcraft.rg.tools.serializer.DimTypeSerializer;
+import net.minecraft.ChatFormatting;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -14,6 +23,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -28,6 +38,7 @@ public class RollingGate implements RGAdditional {
 
     public RollingGate(@NotNull IEventBus modEventBus, @NotNull ModContainer modContainer) {
         modEventBus.addListener(this::onLoadComplete);
+        NeoForge.EVENT_BUS.addListener(this::onPlayerLoggingIn);
         NeoForge.EVENT_BUS.addListener(this::onServerStarting);
         NeoForge.EVENT_BUS.addListener(this::registerCommand);
         modContainer.registerExtensionPoint(RGAdditional.class, this);
@@ -62,5 +73,28 @@ public class RollingGate implements RGAdditional {
     @SubscribeEvent
     public void registerCommand(@NotNull RegisterCommandsEvent event) {
         RollingGate.SERVER_RULE_MANAGER.generateCommand(event.getDispatcher(), MODID, "rg");
+    }
+
+    @SubscribeEvent
+    public void onPlayerLoggingIn(@NotNull PlayerEvent.PlayerLoggedInEvent event){
+        if(RollingGateServerRules.welcomePlayer){
+            WelcomeMessage.onPlayerLoggedIn((ServerPlayer) event.getEntity());
+        }
+    }
+
+    public static final Gson GSON = new GsonBuilder()
+            .setPrettyPrinting()
+            .registerTypeHierarchyAdapter(ResourceKey.class, new DimTypeSerializer())
+            .registerTypeHierarchyAdapter(ResourceLocation.class, new ResourceLocation.Serializer())
+            .registerTypeHierarchyAdapter(ChatFormatting.class, new ChatFormattingSerializer())
+            .registerTypeHierarchyAdapter(WelcomeMessage.MessageData.class, new WelcomeMessage.MessageData.Serializer())
+            .create();
+
+    public static @NotNull ResourceLocation id(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MODID, path);
+    }
+
+    public static @NotNull ResourceLocation parseLocation(String string){
+        return ResourceLocation.parse(string);
     }
 }
