@@ -20,11 +20,7 @@ public class DimTypeSerializer implements JsonSerializer<ResourceKey<Level>>, Js
     public ResourceKey<Level> deserialize(@NotNull JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         return ResourceKey.create(
             Registries.DIMENSION,
-            //#if MC>=12100
             ResourceLocation.parse(json.getAsString())
-            //#else
-            //$$ new ResourceLocation(json.getAsString())
-            //#endif
         );
     }
 

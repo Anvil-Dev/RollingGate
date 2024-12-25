@@ -180,14 +180,11 @@ public class WelcomeMessage {
                         .withHoverEvent(
                                 new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(host))
                         );
-                //#if MC>=12100
                 style = style.withClickEvent(
                         host.contains(":") ?
                                 new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/transfer %s %s".formatted(host.split(":")[0], host.split(":")[1])) :
                                 new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/transfer %s".formatted(host))
                 );
-                //#else
-                //#endif
                 component1.setStyle(style);
                 component.append(component1);
                 if (i != d.getAsJsonArray().size() - 1) component.append(Component.literal(" "));
