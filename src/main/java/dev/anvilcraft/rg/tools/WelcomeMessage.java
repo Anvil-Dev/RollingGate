@@ -39,8 +39,10 @@ public class WelcomeMessage {
     public static final FilesUtil.ObjFile<MessageConfig> WELCOME_MESSAGE = new FilesUtil.ObjFile<>("welcome", new MessageConfig());
 
     public static void onPlayerLoggedIn(@NotNull ServerPlayer player) {
-        MessageConfig config = WELCOME_MESSAGE.obj;
         MinecraftServer server = player.getServer();
+        if (server == null) return;
+        WELCOME_MESSAGE.init(server);
+        MessageConfig config = WELCOME_MESSAGE.obj;
         for (String msg : config.message) {
             List<String> argKeys = new ArrayList<>();
             Matcher matcher = Pattern.compile(ARGS_REGEX).matcher(msg);

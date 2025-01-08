@@ -23,10 +23,10 @@ import java.util.function.Function;
 public abstract class FilesUtil {
     private static final Gson GSON = RollingGate.GSON;
     public MinecraftServer server = null;
-    private final String gcaJson;
+    private final String rgJson;
 
     public FilesUtil(String jsonPrefix) {
-        this.gcaJson = "%s.gca.json".formatted(jsonPrefix);
+        this.rgJson = "%s.rg.json".formatted(jsonPrefix);
     }
 
     public void init(@NotNull CommandContext<CommandSourceStack> context) {
@@ -41,7 +41,7 @@ public abstract class FilesUtil {
     public void init(@NotNull MinecraftServer server1) {
         if (server1 == server) return;
         this.server = server1;
-        File file = this.server.getWorldPath(LevelResource.ROOT).resolve(this.gcaJson).toFile();
+        File file = this.server.getWorldPath(LevelResource.ROOT).resolve(this.rgJson).toFile();
         try {
             if (!file.exists()) {
                 this.createDefault(file);
@@ -59,7 +59,7 @@ public abstract class FilesUtil {
 
     public void save() {
         if (this.server == null) return;
-        File file = this.server.getWorldPath(LevelResource.ROOT).resolve(this.gcaJson).toFile();
+        File file = this.server.getWorldPath(LevelResource.ROOT).resolve(this.rgJson).toFile();
         try (BufferedWriter bw = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
             this.save(bw);
         } catch (IOException e) {
