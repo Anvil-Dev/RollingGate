@@ -1,7 +1,7 @@
-name: CI for RollingGate Mod
+name: Pull Request Check
 on:
   workflow_dispatch:
-  push:
+  pull_request:
     branches:
       - releases/**
     paths:
@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CI_BUILD: true
-      PR_BUILD: false
+      PR_BUILD: true
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -60,14 +60,6 @@ jobs:
         with:
           name: "${{ steps.properties.outputs.mod_name }} ${{ steps.version.outputs.version }}"
           path: build/libs/RollingGate-neoforge-${{ steps.version.outputs.version }}.jar
-
-      - name: Publish to maven
-        run: ./gradlew publish
-        env:
-          MAVEN_URL: ${{ secrets.MAVEN_URL }}
-          MAVEN_USERNAME: ${{ secrets.MAVEN_USER }}
-          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASS }}
-        continue-on-error: true
 
       - name: gametest
         uses: Anvil-Dev/dedicated-server-launch-test@1.21.1-neoforge

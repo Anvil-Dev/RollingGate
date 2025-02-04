@@ -1,24 +1,17 @@
-name: CI for RollingGate Mod
+name: Upload Release Asset
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - releases/**
-    paths:
-      - src/**
-      - common/**
-      - fabric/**
-      - forge/**
-      - build.gradle
-      - gradle.properties
-      - settings.gradle
+  release:
+    types: [ published ]
 
 jobs:
   build:
+    permissions: write-all
     runs-on: ubuntu-latest
     env:
-      CI_BUILD: true
+      CI_BUILD: false
       PR_BUILD: false
+      VERSION_TYPE: ${{ github.event.release.prerelease && 'alpha' || 'release' }}
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -61,6 +54,12 @@ jobs:
           name: "${{ steps.properties.outputs.mod_name }} ${{ steps.version.outputs.version }}"
           path: build/libs/RollingGate-neoforge-${{ steps.version.outputs.version }}.jar
 
+      - name: Upload Release Jar
+        uses: softprops/action-gh-release@v0.1.15
+        with:
+          files: |
+            build/libs/RollingGate-neoforge-${{ steps.version.outputs.version }}.jar
+
       - name: Publish to maven
         run: ./gradlew publish
         env:
@@ -69,7 +68,22 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.MAVEN_PASS }}
         continue-on-error: true
 
-      - name: gametest
-        uses: Anvil-Dev/dedicated-server-launch-test@1.21.1-neoforge
+      - name: publish neoforge mc mod
+        uses: Kir-Antipov/mc-publish@v3.3
+        continue-on-error: true
         with:
-          mod: build/libs/RollingGate-neoforge-${{ steps.version.outputs.version }}.jar
+          name: "${{ steps.properties.outputs.mod_name }} For NeoForge v${{ steps.version.outputs.version }}"
+          version: ${{ steps.version.outputs.version }}
+          game-versions: 1.21.1
+          version-type: ${{ env.VERSION_TYPE }}
+          java: 21
+          fail-mode: skip
+          changelog: ${{ github.event.release.body }}
+
+          modrinth-id: HXsmHiKu
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          modrinth-featured: true
+
+          files: |
+            build/libs/RollingGate-neoforge-${{ steps.version.outputs.version }}.jar
+            build/libs/RollingGate-neoforge-${{ steps.version.outputs.version }}-sources.jar
