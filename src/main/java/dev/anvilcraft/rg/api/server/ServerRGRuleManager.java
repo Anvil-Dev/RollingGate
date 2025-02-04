@@ -172,7 +172,7 @@ public class ServerRGRuleManager extends RGRuleManager {
                 LiteralArgumentBuilder<CommandSourceStack> keyNode = Commands.literal(rgRule.name());
                 if (list) keyNode.executes(ctx -> this.ruleInfoCommand(ctx, rgRule));
                 keyNode.then(
-                    Commands.argument("value", StringArgumentType.word())
+                    Commands.argument("value", StringArgumentType.greedyString())
                         .suggests((context, builder1) -> SharedSuggestionProvider.suggest(rgRule.allowed(), builder1))
                         .executes(context -> execute.apply(context, rgRule, StringArgumentType.getString(context, "value")))
                 );
@@ -222,7 +222,10 @@ public class ServerRGRuleManager extends RGRuleManager {
 
         private <T> @NotNull MutableComponent getValues(@NotNull RGRule<T> rule) {
             MutableComponent result = Component.empty();
+            String string1 = rule.getValue().toString();
+            boolean flag = false;
             for (String string : rule.allowed()) {
+                if (string.equals(string1)) flag = true;
                 if (!string.equals(rule.allowed()[0])) result.append(" ");
                 Object worldDefault = worldConfig.get(rule);
                 Object globalDefault = globalConfig.get(rule);
@@ -252,6 +255,12 @@ public class ServerRGRuleManager extends RGRuleManager {
                     style = style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/%s %s %s".formatted(literal, rule.name(), string)));
                 }
                 result.append(component.withStyle(style));
+            }
+            if (!flag) {
+                result.append(" ").append(
+                    Component.literal("[%s]".formatted(string1))
+                        .withStyle(ChatFormatting.GREEN)
+                );
             }
             return result;
         }
