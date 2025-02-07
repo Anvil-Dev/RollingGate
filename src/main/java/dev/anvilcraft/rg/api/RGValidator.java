@@ -211,7 +211,7 @@ public interface RGValidator<T> {
          * @return 权限级别字符串数组
          */
         public static String @NotNull [] getPermissionLevels() {
-            return new String[]{"ops", "true", "false", "1", "2", "3", "4"};
+            return new String[]{"ops", "true", "false", "0", "1", "2", "3", "4"};
         }
 
         /**
@@ -219,15 +219,15 @@ public interface RGValidator<T> {
          * 此方法通过比较供应商提供的命令规则与预定义的权限级别来确定权限
          *
          * @param supplier 一个供应商对象，用于获取命令规则字符串
-         * @param stack 命令源堆栈，用于检查权限级别
+         * @param stack    命令源堆栈，用于检查权限级别
          * @return 如果供应商提供的命令规则满足权限级别，则返回true，否则返回false
          */
         public static boolean hasPermission(@NotNull Supplier<String> supplier, @NotNull CommandSourceStack stack) {
             String s = supplier.get();
             return switch (s) {
-                case "ops" -> stack.hasPermission(Commands.LEVEL_ALL);
+                case "0" -> stack.hasPermission(Commands.LEVEL_ALL);
                 case "1" -> stack.hasPermission(Commands.LEVEL_MODERATORS);
-                case "2" -> stack.hasPermission(Commands.LEVEL_GAMEMASTERS);
+                case "ops", "2" -> stack.hasPermission(Commands.LEVEL_GAMEMASTERS);
                 case "3" -> stack.hasPermission(Commands.LEVEL_ADMINS);
                 case "4" -> stack.hasPermission(Commands.LEVEL_OWNERS);
                 case "true" -> true;
