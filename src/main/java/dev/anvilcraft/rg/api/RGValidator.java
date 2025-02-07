@@ -1,9 +1,12 @@
 package dev.anvilcraft.rg.api;
 
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * RGValidator 接口用于定义验证操作的规范
@@ -183,6 +186,53 @@ public interface RGValidator<T> {
     abstract class DoubleValidator extends NumberValidator<Double> {
         protected Double parse(@NotNull String newValue) {
             return Double.parseDouble(newValue);
+        }
+    }
+
+    /**
+     * CommandRuleValidator类继承自StringInSetValidator，用于验证命令规则的合法性
+     * 它通过限定一组特定的字符串来确保命令规则符合预期的权限级别或布尔值
+     */
+    class CommandRuleValidator extends StringInSetValidator {
+        /**
+         * 重写getSet方法，返回一组预定义的字符串，这些字符串代表了有效的命令规则
+         * 包括操作者权限级别（ops）、布尔值（true/false）和数字表示的权限级别（1-4）
+         *
+         * @return 一组有效的命令规则字符串
+         */
+        @Override
+        public Set<String> getSet() {
+            return Set.of("ops", "true", "false", "1", "2", "3", "4");
+        }
+
+        /**
+         * 获取权限级别数组，提供了静态方法访问权限级别的字符串数组
+         *
+         * @return 权限级别字符串数组
+         */
+        public static String @NotNull [] getPermissionLevels() {
+            return new String[]{"ops", "true", "false", "1", "2", "3", "4"};
+        }
+
+        /**
+         * 检查给定的供应商提供的命令规则是否满足特定的权限级别
+         * 此方法通过比较供应商提供的命令规则与预定义的权限级别来确定权限
+         *
+         * @param supplier 一个供应商对象，用于获取命令规则字符串
+         * @param stack 命令源堆栈，用于检查权限级别
+         * @return 如果供应商提供的命令规则满足权限级别，则返回true，否则返回false
+         */
+        public static boolean hasPermission(@NotNull Supplier<String> supplier, @NotNull CommandSourceStack stack) {
+            String s = supplier.get();
+            return switch (s) {
+                case "ops" -> stack.hasPermission(Commands.LEVEL_ALL);
+                case "1" -> stack.hasPermission(Commands.LEVEL_MODERATORS);
+                case "2" -> stack.hasPermission(Commands.LEVEL_GAMEMASTERS);
+                case "3" -> stack.hasPermission(Commands.LEVEL_ADMINS);
+                case "4" -> stack.hasPermission(Commands.LEVEL_OWNERS);
+                case "true" -> true;
+                default -> false;
+            };
         }
     }
 }
