@@ -73,3 +73,25 @@ jobs:
         uses: Anvil-Dev/dedicated-server-launch-test@1.21.1-neoforge
         with:
           mod: build/libs/RollingGate-neoforge-${{ steps.version.outputs.version }}.jar
+
+      - name: publish neoforge mc mod
+        uses: Kir-Antipov/mc-publish@v3.3
+        continue-on-error: true
+        with:
+          name: "${{ steps.properties.outputs.mod_name }} For NeoForge v${{ steps.version.outputs.version }}"
+          version: ${{ steps.version.outputs.version }}
+          game-versions: 1.21.1
+          version-type: "alpha"
+          java: 21
+          fail-mode: skip
+
+          modrinth-id: HXsmHiKu
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          modrinth-featured: true
+
+          curseforge-id: 1194894
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+
+          files: |
+            build/libs/RollingGate-neoforge-${{ steps.version.outputs.version }}.jar
+            build/libs/RollingGate-neoforge-${{ steps.version.outputs.version }}-sources.jar
