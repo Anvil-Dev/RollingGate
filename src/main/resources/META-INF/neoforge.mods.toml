@@ -9,7 +9,7 @@ version = "${mod_version}"
 displayName = "${mod_name}"
 #updateJSONURL="https://change.me.example.invalid/updates.json"
 displayURL = "https://rg.anvilcraft.dev"
-#logoFile="icon.png"
+logoFile="pack.png"
 authors = "${mod_authors}"
 description = '''${mod_description}'''
 

@@ -23,5 +23,9 @@
   "rolling_gate.command.rule.set.default.button": "设为默认",
   "rolling_gate.command.rule.set.default": "规则 %s 的值已默认设置为 %s",
   "rolling_gate.command.root.not_found": "未找到此 ID 的模组: %s",
-  "rolling_gate.command.exception.not_exist": "规则 %s 不存在"
+  "rolling_gate.command.exception.not_exist": "规则 %s 不存在",
+
+  "rolling_gate.chest_menu.button.none": "暂无功能",
+  "rolling_gate.chest_menu.button.on": "开启",
+  "rolling_gate.chest_menu.button.off": "关闭"
 }

@@ -23,5 +23,9 @@
   "rolling_gate.command.rule.set.default.button": "SET AS DEFAULT",
   "rolling_gate.command.rule.set.default": "The value of rule %s has been set to %s by default",
   "rolling_gate.command.root.not_found": "Not found mod by id: %s",
-  "rolling_gate.command.exception.not_exist": "Rule %s is not exist"
+  "rolling_gate.command.exception.not_exist": "Rule %s is not exist",
+
+  "rolling_gate.chest_menu.button.none": "None",
+  "rolling_gate.chest_menu.button.on": "ON",
+  "rolling_gate.chest_menu.button.off": "OFF"
 }
