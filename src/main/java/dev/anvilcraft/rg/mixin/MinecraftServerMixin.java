@@ -1,5 +1,6 @@
 package dev.anvilcraft.rg.mixin;
 
+import dev.anvilcraft.rg.event.ServerAboutToStopEvent;
 import dev.anvilcraft.rg.event.ServerLoadedLevelEvent;
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.neoforge.common.NeoForge;
@@ -10,6 +11,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MinecraftServer.class)
 public class MinecraftServerMixin {
+    @Inject(
+        method = {"stopServer"},
+        at = {@At("HEAD")}
+    )
+    private void serverClosed(CallbackInfo ci) {
+        NeoForge.EVENT_BUS.post(new ServerAboutToStopEvent((MinecraftServer) (Object) this));
+    }
+    
     @Inject(
         method = {"loadLevel"},
         at = {@At("RETURN")}
