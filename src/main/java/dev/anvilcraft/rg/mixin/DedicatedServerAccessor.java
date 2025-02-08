@@ -1,4 +1,4 @@
-package dev.anvilcraft.rg.mixin.server;
+package dev.anvilcraft.rg.mixin;
 
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.dedicated.DedicatedServerSettings;

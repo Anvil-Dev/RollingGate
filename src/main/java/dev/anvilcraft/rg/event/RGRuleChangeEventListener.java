@@ -2,7 +2,7 @@ package dev.anvilcraft.rg.event;
 
 import dev.anvilcraft.rg.RollingGate;
 import dev.anvilcraft.rg.api.event.RGRuleChangeEvent;
-import dev.anvilcraft.rg.mixin.server.DedicatedServerAccessor;
+import dev.anvilcraft.rg.mixin.DedicatedServerAccessor;
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;

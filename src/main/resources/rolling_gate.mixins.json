@@ -5,8 +5,10 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "rolling_gate.refmap.json",
   "mixins": [
+    "AbstractContainerMenuMixin",
+    "DedicatedServerAccessor",
     "ItemStackMixin",
-    "server.DedicatedServerAccessor"
+    "MinecraftServerMixin"
   ],
   "client": [
   ],
