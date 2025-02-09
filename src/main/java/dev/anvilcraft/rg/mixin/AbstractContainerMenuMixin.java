@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AbstractContainerMenu.class)
-public class AbstractContainerMenuMixin {
+abstract class AbstractContainerMenuMixin {
     @Inject(method = "doClick", at = @At("HEAD"), cancellable = true)
     private void doClick(int slotIndex, int button, ClickType clickType, Player player, CallbackInfo ci) {
         if (slotIndex < 0) return;
