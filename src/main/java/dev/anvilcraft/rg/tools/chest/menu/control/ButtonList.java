@@ -1,15 +1,17 @@
 package dev.anvilcraft.rg.tools.chest.menu.control;
 
+import lombok.Getter;
+
 import java.util.List;
 
+@Getter
 public abstract class ButtonList {
-
     protected final List<Button> buttons;
 
     public ButtonList(List<Button> buttons, boolean required) {
         this.buttons = buttons;
         if (required) {
-            buttons.get(0).turnOnWithoutFunction();
+            buttons.getFirst().turnOnWithoutFunction();
             for (Button button : this.buttons) {
                 button.addTurnOffFunction((() -> {
                     if (this.isAllOff()) {
@@ -22,7 +24,7 @@ public abstract class ButtonList {
 
     public boolean isAllOff() {
         for (Button button : this.buttons) {
-            if (button.getFlag()) {
+            if (button.isOn()) {
                 return false;
             }
         }
@@ -31,7 +33,7 @@ public abstract class ButtonList {
 
     public boolean isAllOn() {
         for (Button button : this.buttons) {
-            if (!button.getFlag()) {
+            if (!button.isOn()) {
                 return false;
             }
         }

@@ -2,6 +2,7 @@ package dev.anvilcraft.rg.tools.chest.menu.control;
 
 import dev.anvilcraft.rg.api.server.TranslationUtil;
 import dev.anvilcraft.rg.tools.chest.Consumer;
+import lombok.Getter;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("unused")
+@Getter
 public class Button {
     private boolean init = false;
     private boolean flag;
@@ -191,7 +193,7 @@ public class Button {
         }
     }
 
-    public boolean getFlag() {
+    public boolean isOn() {
         return flag;
     }
 }
