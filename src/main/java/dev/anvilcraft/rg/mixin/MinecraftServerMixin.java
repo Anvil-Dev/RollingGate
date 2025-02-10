@@ -1,7 +1,7 @@
 package dev.anvilcraft.rg.mixin;
 
-import dev.anvilcraft.rg.event.ServerAboutToStopEvent;
-import dev.anvilcraft.rg.event.ServerLoadedLevelEvent;
+import dev.anvilcraft.rg.api.event.ServerAboutToStopEvent;
+import dev.anvilcraft.rg.api.event.ServerLoadedLevelEvent;
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;

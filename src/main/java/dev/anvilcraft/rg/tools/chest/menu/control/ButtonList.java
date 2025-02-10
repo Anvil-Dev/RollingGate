@@ -5,6 +5,7 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
+@SuppressWarnings("unused")
 public abstract class ButtonList {
     protected final List<Button> buttons;
 

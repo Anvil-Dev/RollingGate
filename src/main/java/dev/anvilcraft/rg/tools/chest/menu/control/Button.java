@@ -18,8 +18,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("unused")
 @Getter
+@SuppressWarnings("unused")
 public class Button {
     private boolean init = false;
     private boolean flag;

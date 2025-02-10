@@ -1,6 +1,6 @@
 package dev.anvilcraft.rg.mixin;
 
-import dev.anvilcraft.rg.event.ServerAboutToStopEvent;
+import dev.anvilcraft.rg.api.event.ServerAboutToStopEvent;
 import net.minecraft.client.server.IntegratedServer;
 import net.neoforged.neoforge.common.NeoForge;
 import org.spongepowered.asm.mixin.Mixin;

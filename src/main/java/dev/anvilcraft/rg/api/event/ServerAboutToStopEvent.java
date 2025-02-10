@@ -1,4 +1,4 @@
-package dev.anvilcraft.rg.event;
+package dev.anvilcraft.rg.api.event;
 
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.neoforge.event.server.ServerLifecycleEvent;

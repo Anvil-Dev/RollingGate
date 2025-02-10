@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public abstract class CustomChestMenu implements Container {
     public final List<Map.Entry<Integer, Button>> buttons = new ArrayList<>();
     public final List<ButtonList> buttonLists = new ArrayList<>();

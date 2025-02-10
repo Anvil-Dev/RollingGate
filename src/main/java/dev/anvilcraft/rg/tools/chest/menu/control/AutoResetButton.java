@@ -6,6 +6,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
+@SuppressWarnings("unused")
 public class AutoResetButton extends Button {
     public AutoResetButton(String key) {
         super(false,

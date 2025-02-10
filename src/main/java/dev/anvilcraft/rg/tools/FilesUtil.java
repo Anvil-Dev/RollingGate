@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
 
+@SuppressWarnings("unused")
 public abstract class FilesUtil {
     private static final Gson GSON = RollingGate.GSON;
     public MinecraftServer server = null;

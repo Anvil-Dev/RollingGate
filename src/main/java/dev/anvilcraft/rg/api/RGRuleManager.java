@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dev.anvilcraft.rg.RollingGate;
+import lombok.Setter;
 import net.neoforged.fml.loading.FMLPaths;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,6 +36,7 @@ public class RGRuleManager {
     // 全局配置映射表
     protected final Map<RGRule<?>, Object> globalConfig = new HashMap<>();
     // 默认命名空间
+    @Setter
     protected String namespace = "rolling_gate";
     // 存储规则类别的列表
     protected final Set<String> categories = new HashSet<>();
@@ -147,15 +149,6 @@ public class RGRuleManager {
     public void register(Class<?> rules) {
         // 创建并添加规则到管理器
         RGRuleManager.of(this.namespace, rules).forEach(this::addRule);
-    }
-
-    /**
-     * 设置管理器的命名空间
-     *
-     * @param namespace 命名空间
-     */
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
     }
 
     /**
