@@ -16,7 +16,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ItemStack.class)
 abstract class ItemStackMixin {
-    @Shadow @Final
+    @Shadow
+    @Final
     PatchedDataComponentMap components;
 
     @Inject(method = "getComponents", at = @At("HEAD"), cancellable = true)

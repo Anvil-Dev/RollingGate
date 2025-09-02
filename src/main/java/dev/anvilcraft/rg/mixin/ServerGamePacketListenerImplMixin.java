@@ -18,7 +18,14 @@ public abstract class ServerGamePacketListenerImplMixin {
     @Shadow
     public abstract ServerPlayer getPlayer();
 
-    @Inject(method = "lambda$handleChat$5", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;broadcastChatMessage(Lnet/minecraft/network/chat/PlayerChatMessage;)V", shift = At.Shift.AFTER))
+    @Inject(
+        method = "lambda$handleChat$5",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;broadcastChatMessage(Lnet/minecraft/network/chat/PlayerChatMessage;)V",
+            shift = At.Shift.AFTER
+        )
+    )
     private void handleChat(Component component, PlayerChatMessage playerchatmessage, FilteredText p_300785_, CallbackInfo ci) {
         NeoForge.EVENT_BUS.post(new ServerPlayerChatEvent(this.getPlayer(), component, playerchatmessage, p_300785_));
     }
