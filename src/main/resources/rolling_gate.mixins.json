@@ -12,7 +12,8 @@
     "ServerGamePacketListenerImplMixin"
   ],
   "client": [
-    "IntegratedServerMixin"
+    "IntegratedServerMixin",
+    "TitleScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

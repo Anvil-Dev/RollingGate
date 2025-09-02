@@ -4,12 +4,13 @@ import dev.anvilcraft.rg.RollingGate;
 import dev.anvilcraft.rg.api.event.RGRuleChangeEvent;
 import dev.anvilcraft.rg.client.RollingGateClient;
 import net.minecraft.client.Minecraft;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
-@EventBusSubscriber(modid = RollingGate.MODID)
+@EventBusSubscriber(modid = RollingGate.MODID, value = Dist.CLIENT)
 public class RGRuleChangeEventListener {
     @SubscribeEvent
     public static void onRuleChange(@NotNull RGRuleChangeEvent.Client<?> event) {
