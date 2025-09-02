@@ -237,7 +237,7 @@ public class ServerRGRuleManager extends RGRuleManager {
                     categoryComponent.withStyle(
                         Style.EMPTY
                             .applyFormat(ChatFormatting.AQUA)
-                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/%s category %s".formatted(literal, category)))
+                            .withClickEvent(new ClickEvent.RunCommand("/%s category %s".formatted(literal, category)))
                     );
                     categoriesComponent.append(categoryComponent);
                 }
@@ -287,8 +287,8 @@ public class ServerRGRuleManager extends RGRuleManager {
                     style = style.withColor(ChatFormatting.GRAY);
                 }
                 if (!isSelect) {
-                    style = style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TranslationUtil.trans("rolling_gate.command.rule.select.hover")));
-                    style = style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/%s %s %s".formatted(literal, rule.name(), string)));
+                    style = style.withHoverEvent(new HoverEvent.ShowText(TranslationUtil.trans("rolling_gate.command.rule.select.hover")));
+                    style = style.withClickEvent(new ClickEvent.RunCommand("/%s %s %s".formatted(literal, rule.name(), string)));
                 }
                 result.append(component.withStyle(style));
             }
@@ -311,7 +311,7 @@ public class ServerRGRuleManager extends RGRuleManager {
                 MutableComponent name = TranslationUtil.trans(rule.getNameTranslationKey());
                 component.append(name);
                 MutableComponent hover = TranslationUtil.trans(rule.getDescriptionTranslationKey());
-                name.withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover)));
+                name.withStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(hover)));
                 MutableComponent values = this.getValues(rule);
                 component.append(" ").append(values);
                 context.getSource().sendSuccess(() -> component, false);
@@ -331,7 +331,7 @@ public class ServerRGRuleManager extends RGRuleManager {
                     .append("]")
                     .withStyle(Style.EMPTY
                         .applyFormat(ChatFormatting.AQUA)
-                        .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/%s default %s %s".formatted(literal, rule.name(), value)))
+                        .withClickEvent(new ClickEvent.SuggestCommand("/%s default %s %s".formatted(literal, rule.name(), value)))
                     );
                 result.append(" ").append(setDefault);
                 context.getSource().sendSuccess(() -> result, false);

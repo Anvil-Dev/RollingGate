@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-@EventBusSubscriber(value = Dist.CLIENT, modid = RollingGate.MODID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(value = Dist.CLIENT, modid = RollingGate.MODID)
 public class RollingGateClient {
     public static final ClientRGRuleManager CLIENT_RULE_MANAGER = new ClientRGRuleManager(RollingGate.MODID);
 

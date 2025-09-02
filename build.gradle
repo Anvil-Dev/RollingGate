@@ -3,15 +3,17 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '2.0.30-beta'
+    id 'net.neoforged.moddev' version '2.0.107'
     id 'io.freefair.lombok' version '8.7.1'
 }
 
+tasks.named('wrapper', Wrapper).configure {
+    distributionType = Wrapper.DistributionType.BIN
+}
 
 String buildType = 'build'
 String buildNumber
-if (System.getenv("CI_BUILD") == 'false') buildNumber = null
-else {
+if (System.getenv("CI_BUILD") == 'false') buildNumber = null else {
     if (System.getenv("PR_BUILD") != 'false') buildType = 'pr'
     buildNumber = System.getenv("GITHUB_RUN_NUMBER")
 }
@@ -24,7 +26,7 @@ repositories {
 }
 
 base {
-    archivesName = mod_name + "-neoforge-1.21.1"
+    archivesName = mod_name + "-neoforge-1.21.8"
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(java_version)
@@ -56,13 +58,17 @@ neoForge {
         }
 
         data {
-            data()
+            clientData()
 
             programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
         }
 
+        var isJbr = System.getProperty('java.vm.vendor').contains('JetBrains')
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'
+            if (isJbr) {
+                jvmArgument "-XX:+AllowEnhancedClassRedefinition"
+            }
             logLevel = org.slf4j.event.Level.DEBUG
         }
     }
@@ -77,8 +83,7 @@ neoForge {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 
-dependencies {
-}
+dependencies {}
 
 tasks.withType(ProcessResources).configureEach {
     var replaceProperties = [minecraft_version      : minecraft_version,

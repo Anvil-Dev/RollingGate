@@ -24,7 +24,7 @@ abstract class AbstractContainerMenuMixin {
         if (customData == null || customData.copyTag().get(Button.RG_CLEAR) == null) {
             return;
         }
-        if (customData.copyTag().getBoolean(Button.RG_CLEAR)) {
+        if (customData.copyTag().getBoolean(Button.RG_CLEAR).orElse(false)) {
             itemStack.setCount(0);
             ci.cancel();
         }
