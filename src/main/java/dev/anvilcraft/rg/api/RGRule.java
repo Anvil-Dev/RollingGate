@@ -8,6 +8,7 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -22,9 +23,21 @@ import java.util.Map;
  *
  * @param <T> 配置项的类型
  */
-public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environment, String[] categories,
-                        String serialize, boolean onlyAllowed, String[] allowed, String min, String max,
-                        List<RGValidator<T>> validators, T defaultValue, Field field, RGCodec<T> codec) {
+public record RGRule<T>(
+    String namespace,
+    Class<T> type,
+    RGEnvironment environment,
+    String[] categories,
+    String serialize,
+    boolean onlyAllowed,
+    String[] allowed,
+    String min,
+    String max,
+    List<RGValidator<T>> validators,
+    T defaultValue,
+    Field field,
+    RGCodec<T> codec
+) {
 
     /**
      * CODECS映射用于存储支持的类型及其对应的编解码器
@@ -88,7 +101,12 @@ public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environme
         } else if (rgCodec.clazz() == Boolean.class) {
             // 为Boolean类型添加默认验证器和允许值
             validators.add((RGValidator<T>) new RGValidator.BooleanValidator());
-            if (allowed.length < 1) allowed = new String[]{"true", "false"};
+            if (allowed.length < 1) {
+                allowed = new String[]{
+                    "true",
+                    "false"
+                };
+            }
         } else if (rgCodec.clazz() == String.class && validators.isEmpty()) {
             // 为String类型添加默认验证器
             validators.add((RGValidator<T>) new RGValidator.StringValidator());
@@ -96,69 +114,57 @@ public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environme
             if (rgCodec.clazz() == Integer.class) {
                 int min = (int) RGRule.getRuleMin(rule.min(), rgCodec);
                 int max = (int) RGRule.getRuleMax(rule.max(), rgCodec);
-                validators.add((RGValidator<T>)
-                    new RGValidator.IntegerValidator() {
-                        @Override
-                        public Map.@NotNull Entry<Integer, Integer> getRange() {
-                            return Map.entry(min, max);
-                        }
+                validators.add((RGValidator<T>) new RGValidator.IntegerValidator() {
+                    @Override
+                    public Map.@NotNull Entry<Integer, Integer> getRange() {
+                        return Map.entry(min, max);
                     }
-                );
+                });
             } else if (rgCodec.clazz() == Double.class) {
                 double min = (double) RGRule.getRuleMin(rule.min(), rgCodec);
                 double max = (double) RGRule.getRuleMax(rule.max(), rgCodec);
-                validators.add((RGValidator<T>)
-                    new RGValidator.DoubleValidator() {
-                        @Override
-                        public Map.@NotNull Entry<Double, Double> getRange() {
-                            return Map.entry(min, max);
-                        }
+                validators.add((RGValidator<T>) new RGValidator.DoubleValidator() {
+                    @Override
+                    public Map.@NotNull Entry<Double, Double> getRange() {
+                        return Map.entry(min, max);
                     }
-                );
+                });
             } else if (rgCodec.clazz() == Float.class) {
                 float min = (float) RGRule.getRuleMin(rule.min(), rgCodec);
                 float max = (float) RGRule.getRuleMax(rule.max(), rgCodec);
-                validators.add((RGValidator<T>)
-                    new RGValidator.FloatValidator() {
-                        @Override
-                        public Map.@NotNull Entry<Float, Float> getRange() {
-                            return Map.entry(min, max);
-                        }
+                validators.add((RGValidator<T>) new RGValidator.FloatValidator() {
+                    @Override
+                    public Map.@NotNull Entry<Float, Float> getRange() {
+                        return Map.entry(min, max);
                     }
-                );
+                });
             } else if (rgCodec.clazz() == Short.class) {
                 short min = (short) RGRule.getRuleMin(rule.min(), rgCodec);
                 short max = (short) RGRule.getRuleMax(rule.max(), rgCodec);
-                validators.add((RGValidator<T>)
-                    new RGValidator.ShortValidator() {
-                        @Override
-                        public Map.@NotNull Entry<Short, Short> getRange() {
-                            return Map.entry(min, max);
-                        }
+                validators.add((RGValidator<T>) new RGValidator.ShortValidator() {
+                    @Override
+                    public Map.@NotNull Entry<Short, Short> getRange() {
+                        return Map.entry(min, max);
                     }
-                );
+                });
             } else if (rgCodec.clazz() == Byte.class) {
                 byte min = (byte) RGRule.getRuleMin(rule.min(), rgCodec);
                 byte max = (byte) RGRule.getRuleMax(rule.max(), rgCodec);
-                validators.add((RGValidator<T>)
-                    new RGValidator.ByteValidator() {
-                        @Override
-                        public Map.@NotNull Entry<Byte, Byte> getRange() {
-                            return Map.entry(min, max);
-                        }
+                validators.add((RGValidator<T>) new RGValidator.ByteValidator() {
+                    @Override
+                    public Map.@NotNull Entry<Byte, Byte> getRange() {
+                        return Map.entry(min, max);
                     }
-                );
+                });
             } else if (rgCodec.clazz() == Long.class) {
                 long min = (long) RGRule.getRuleMin(rule.min(), rgCodec);
                 long max = (long) RGRule.getRuleMax(rule.max(), rgCodec);
-                validators.add((RGValidator<T>)
-                    new RGValidator.LongValidator() {
-                        @Override
-                        public Map.@NotNull Entry<Long, Long> getRange() {
-                            return Map.entry(min, max);
-                        }
+                validators.add((RGValidator<T>) new RGValidator.LongValidator() {
+                    @Override
+                    public Map.@NotNull Entry<Long, Long> getRange() {
+                        return Map.entry(min, max);
                     }
-                );
+                });
             }
         }
         try {
@@ -244,7 +250,7 @@ public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environme
         }
     }
 
-    public List<T> getTypedAllowed() {
+    public @NotNull @Unmodifiable List<T> getTypedAllowed() {
         return Arrays.stream(this.allowed).map(this.codec::decode).toList();
     }
 
@@ -315,7 +321,12 @@ public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environme
             }
             RGRuleChangeEvent<T> event;
             if (this.environment().isServer()) {
-                event = new RGRuleChangeEvent.Server<>(this, this.getValue(), this.codec.decode(value), ServerLifecycleHooks.getCurrentServer());
+                event = new RGRuleChangeEvent.Server<>(
+                    this,
+                    this.getValue(),
+                    this.codec.decode(value),
+                    ServerLifecycleHooks.getCurrentServer()
+                );
             } else {
                 event = new RGRuleChangeEvent.Client<>(this, this.getValue(), this.codec.decode(value));
             }
@@ -338,7 +349,9 @@ public record RGRule<T>(String namespace, Class<T> type, RGEnvironment environme
         if (rgCodec != null) {
             if (primitive.isJsonPrimitive() && primitive.getAsJsonPrimitive().isString()) {
                 this.setFieldValue(primitive.getAsString());
-            } else this.setFieldValue(primitive.toString());
+            } else {
+                this.setFieldValue(primitive.toString());
+            }
             return;
         }
         throw new RGRuleException("Field %s has unsupported type %s", this.name(), this.field.getType().getTypeName());

@@ -4,12 +4,14 @@ import dev.anvilcraft.rg.RollingGate;
 import dev.anvilcraft.rg.api.RGEnvironment;
 import dev.anvilcraft.rg.api.RGRule;
 import dev.anvilcraft.rg.api.RGRuleManager;
+import dev.anvilcraft.rg.api.event.RGRuleChangeEvent;
 import lombok.Getter;
 import net.neoforged.fml.loading.LoadingModList;
 import net.neoforged.fml.loading.moddiscovery.ModFileInfo;
 import net.neoforged.fml.loading.progress.ProgressMeter;
 import net.neoforged.fml.loading.progress.StartupNotificationManager;
 import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforgespi.language.ModFileScanData;
 
 import java.lang.annotation.ElementType;
@@ -43,8 +45,7 @@ public class ClientRGRuleManager extends RGRuleManager {
         ProgressMeter meter = StartupNotificationManager.addProgressBar("Load Server Rules", LoadingModList.get().getModFiles().size());
         for (ModFileInfo modFile : LoadingModList.get().getModFiles()) {
             meter.increment();
-            @SuppressWarnings("UnstableApiUsage")
-            ModFileScanData scanData = modFile.getFile().getScanResult();
+            @SuppressWarnings("UnstableApiUsage") ModFileScanData scanData = modFile.getFile().getScanResult();
             for (ModFileScanData.AnnotationData annotation : scanData.getAnnotations()) {
                 if (annotation.annotationType().getDescriptor().equals(ANNOTATION_NAME) && annotation.targetType() == ElementType.TYPE) {
                     String memberName = annotation.memberName();
@@ -105,12 +106,25 @@ public class ClientRGRuleManager extends RGRuleManager {
         }
     }
 
-    @SuppressWarnings({"unchecked", "unused"})
+    @SuppressWarnings(
+        {
+            "unchecked",
+            "unused"
+        }
+    )
     public <T> void onRuleChange(RGRule<?> rule, Object oldValue, Object newValue) {
         ModConfigSpec.ConfigValue<T> value = (ModConfigSpec.ConfigValue<T>) this.configValueMap.get(rule);
         if (value == null) return;
         T value1 = (T) newValue;
         if (!value.get().equals(value1)) value.set(value1);
+    }
+
+    public <T> void loadSuccess() {
+        for (RGRule<?> rule : this.configValueMap.keySet()) {
+            @SuppressWarnings("unchecked")
+            RGRuleChangeEvent<T> event = new RGRuleChangeEvent.Client<>((RGRule<T>) rule, (T) rule.defaultValue(), (T) rule.getValue());
+            NeoForge.EVENT_BUS.post(event);
+        }
     }
 }
 
