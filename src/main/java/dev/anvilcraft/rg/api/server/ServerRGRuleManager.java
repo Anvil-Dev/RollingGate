@@ -13,6 +13,7 @@ import dev.anvilcraft.rg.api.RGEnvironment;
 import dev.anvilcraft.rg.api.RGRule;
 import dev.anvilcraft.rg.api.RGRuleException;
 import dev.anvilcraft.rg.api.RGRuleManager;
+import dev.anvilcraft.rg.network.RollingGateNetwork;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -105,6 +106,7 @@ public class ServerRGRuleManager extends RGRuleManager {
     public <T> void setWorldConfig(@NotNull MinecraftServer server, @NotNull RGRule<T> rule, T value) {
         this.worldConfig.put(rule, value);
         ConfigUtil.writeContent(server.getWorldPath(worldConfigPath), GSON.toJson(this.getSerializedConfig(this.worldConfig)));
+        RollingGateNetwork.syncRuleToHelloPlayers(rule);
     }
 
     /**
@@ -121,6 +123,12 @@ public class ServerRGRuleManager extends RGRuleManager {
             if (entry.getValue().equals(this.globalConfig.get(entry.getKey()))) continue;
             this.worldConfig.put(entry.getKey(), entry.getValue());
         }
+    }
+
+    @Override
+    public void resetRulesToDefault() {
+        super.resetRulesToDefault();
+        this.worldConfig.clear();
     }
 
     /**
@@ -218,6 +226,7 @@ public class ServerRGRuleManager extends RGRuleManager {
 
         private int reloadCommand(@NotNull CommandContext<CommandSourceStack> context) {
             reInit(context.getSource().getServer());
+            RollingGateNetwork.syncRulesToHelloPlayers();
             context.getSource().sendSuccess(() -> TranslationUtil.trans("rolling_gate.command.reload.success").withStyle(ChatFormatting.GREEN), false);
             return 1;
         }

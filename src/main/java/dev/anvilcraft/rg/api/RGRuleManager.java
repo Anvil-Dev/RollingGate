@@ -107,6 +107,53 @@ public class RGRuleManager {
     /**
      * 重新初始化全局配置
      */
+    public @NotNull Map<String, String> getSerializedCurrentRules() {
+        Map<String, String> result = new HashMap<>();
+        for (Map.Entry<String, RGRule<?>> entry : this.rules.entrySet()) {
+            RGRule<?> rule = entry.getValue();
+            result.put(entry.getKey(), this.encodeRuleValue(rule));
+        }
+        return result;
+    }
+
+    public void applySerializedRules(@NotNull Map<String, String> rules) {
+        for (Map.Entry<String, String> entry : rules.entrySet()) {
+            this.applySerializedRule(entry.getKey(), entry.getValue());
+        }
+    }
+
+    public void applySerializedRule(String ruleKey, String value) {
+        RGRule<?> rule = this.rules.get(ruleKey);
+        if (rule == null) {
+            RollingGate.LOGGER.warn("{}({}) not exist.", ruleKey, value);
+            return;
+        }
+        this.applySerializedRule(rule, value);
+    }
+
+    public void resetRulesToDefault() {
+        this.globalConfig.clear();
+        for (RGRule<?> rule : this.rules.values()) {
+            this.setRuleValue(rule, rule.defaultValue());
+        }
+    }
+
+    private <T> @NotNull String encodeRuleValue(@NotNull RGRule<T> rule) {
+        return rule.codec().encode(rule.getValue());
+    }
+
+    private <T> void applySerializedRule(@NotNull RGRule<T> rule, String value) {
+        this.setRuleValue(rule, rule.codec().decode(value));
+    }
+
+    private <T> void setRuleValue(@NotNull RGRule<T> rule, Object value) {
+        try {
+            rule.field().set(null, rule.type().cast(value));
+        } catch (IllegalAccessException e) {
+            throw RGRuleException.illegalAccess(rule.name());
+        }
+    }
+
     public void reInit() {
         this.globalConfig.clear();
         // 从配置文件中重新加载并设置规则
