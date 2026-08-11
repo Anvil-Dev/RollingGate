@@ -3,7 +3,7 @@ package dev.anvilcraft.rg;
 import com.mojang.logging.LogUtils;
 import dev.anvilcraft.rg.api.server.ServerRGRuleManager;
 import dev.anvilcraft.rg.network.RollingGateNetwork;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -54,7 +54,7 @@ public class RollingGate {
         RollingGate.SERVER_RULE_MANAGER.generateCommand(event.getDispatcher(), MODID, "rg");
     }
 
-    public static @NotNull ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MODID, path);
+    public static @NotNull Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MODID, path);
     }
 }

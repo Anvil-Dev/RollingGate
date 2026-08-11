@@ -9,7 +9,7 @@ import dev.anvilcraft.rg.RollingGate;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +29,7 @@ import java.util.function.Function;
 public abstract class FilesUtil {
     public static final Gson GSON = new GsonBuilder()
         .setPrettyPrinting()
-        .registerTypeHierarchyAdapter(ResourceLocation.class, new ResourceLocationSerializer())
+        .registerTypeHierarchyAdapter(Identifier.class, new ResourceLocationSerializer())
         .registerTypeHierarchyAdapter(ResourceKey.class, new DimTypeSerializer())
         .registerTypeHierarchyAdapter(ChatFormatting.class, new ChatFormattingSerializer())
         .create();
@@ -53,7 +53,7 @@ public abstract class FilesUtil {
     public void setGson(@NotNull Consumer<GsonBuilder> gson) {
         GsonBuilder builder = new GsonBuilder()
             .setPrettyPrinting()
-            .registerTypeHierarchyAdapter(ResourceLocation.class, new ResourceLocationSerializer())
+            .registerTypeHierarchyAdapter(Identifier.class, new ResourceLocationSerializer())
             .registerTypeHierarchyAdapter(ResourceKey.class, new DimTypeSerializer());
         gson.accept(builder);
         this.gson = builder.create();

@@ -3,8 +3,8 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '2.0.107'
-    id 'io.freefair.lombok' version '8.7.1'
+    id 'net.neoforged.moddev' version '2.0.140'
+    id 'io.freefair.lombok' version '9.2.0'
 }
 
 tasks.named('wrapper', Wrapper).configure {
@@ -26,18 +26,13 @@ repositories {
 }
 
 base {
-    archivesName = mod_name + "-neoforge-1.21.10"
+    archivesName = mod_name + "-neoforge-26.1.2"
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(java_version)
 
 neoForge {
     version = project.neo_version
-
-    parchment {
-        mappingsVersion = project.parchment_mappings_version
-        minecraftVersion = project.parchment_minecraft_version
-    }
 
     runs {
         client {
@@ -140,5 +135,5 @@ idea {
 }
 
 lombok {
-    version = "1.18.34"
+    version = "1.18.44"
 }

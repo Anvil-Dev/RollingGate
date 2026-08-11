@@ -4,7 +4,7 @@ import dev.anvilcraft.rg.tools.chest.menu.control.Button;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
@@ -15,8 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AbstractContainerMenu.class)
 abstract class AbstractContainerMenuMixin {
-    @Inject(method = "doClick", at = @At("HEAD"), cancellable = true)
-    private void doClick(int slotIndex, int button, ClickType clickType, Player player, CallbackInfo ci) {
+    @Inject(method = "clicked", at = @At("HEAD"), cancellable = true)
+    private void clicked(int slotIndex, int button, ContainerInput input, Player player, CallbackInfo ci) {
         if (slotIndex < 0) return;
         Slot slot = ((AbstractContainerMenu) (Object) this).getSlot(slotIndex);
         ItemStack itemStack = slot.getItem();

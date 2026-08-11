@@ -225,11 +225,11 @@ public interface RGValidator<T> {
         public static boolean hasPermission(@NotNull Supplier<?> supplier, @NotNull CommandSourceStack stack) {
             String s = String.valueOf(supplier.get());
             return switch (s) {
-                case "0" -> stack.hasPermission(Commands.LEVEL_ALL);
-                case "1" -> stack.hasPermission(Commands.LEVEL_MODERATORS);
-                case "ops", "2" -> stack.hasPermission(Commands.LEVEL_GAMEMASTERS);
-                case "3" -> stack.hasPermission(Commands.LEVEL_ADMINS);
-                case "4" -> stack.hasPermission(Commands.LEVEL_OWNERS);
+                case "0" -> Commands.LEVEL_ALL.check(stack.permissions());
+                case "1" -> Commands.LEVEL_MODERATORS.check(stack.permissions());
+                case "ops", "2" -> Commands.LEVEL_GAMEMASTERS.check(stack.permissions());
+                case "3" -> Commands.LEVEL_ADMINS.check(stack.permissions());
+                case "4" -> Commands.LEVEL_OWNERS.check(stack.permissions());
                 case "true", "TRUE" -> true;
                 default -> false;
             };

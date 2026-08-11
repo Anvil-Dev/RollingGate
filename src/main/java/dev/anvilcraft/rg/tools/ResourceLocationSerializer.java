@@ -7,19 +7,19 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 
-public class ResourceLocationSerializer implements JsonSerializer<ResourceLocation>, JsonDeserializer<ResourceLocation> {
+public class ResourceLocationSerializer implements JsonSerializer<Identifier>, JsonDeserializer<Identifier> {
     @Override
-    public ResourceLocation deserialize(@NotNull JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        return ResourceLocation.parse(json.getAsString());
+    public Identifier deserialize(@NotNull JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        return Identifier.parse(json.getAsString());
     }
 
     @Override
-    public JsonElement serialize(@NotNull ResourceLocation src, Type typeOfSrc, JsonSerializationContext context) {
+    public JsonElement serialize(@NotNull Identifier src, Type typeOfSrc, JsonSerializationContext context) {
         return new JsonPrimitive(src.toString());
     }
 }

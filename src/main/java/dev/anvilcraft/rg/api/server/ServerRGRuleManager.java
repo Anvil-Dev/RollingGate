@@ -198,7 +198,7 @@ public class ServerRGRuleManager extends RGRuleManager {
         }
 
         private boolean checkPermission(@NotNull CommandSourceStack source) {
-            if (source.hasPermission(Commands.LEVEL_GAMEMASTERS)) return true;
+            if (Commands.LEVEL_GAMEMASTERS.check(source.permissions())) return true;
             if (!source.isPlayer()) return false;
             ServerPlayer player = source.getPlayer();
             if (player == null) return false;
