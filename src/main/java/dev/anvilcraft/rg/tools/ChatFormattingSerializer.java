@@ -11,15 +11,20 @@ import net.minecraft.ChatFormatting;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
+import java.util.Locale;
 
 public class ChatFormattingSerializer implements JsonSerializer<ChatFormatting>, JsonDeserializer<ChatFormatting> {
     @Override
     public ChatFormatting deserialize(@NotNull JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        return ChatFormatting.getByName(json.getAsString());
+        try {
+            return ChatFormatting.valueOf(json.getAsString().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     @Override
     public JsonElement serialize(@NotNull ChatFormatting src, Type typeOfSrc, JsonSerializationContext context) {
-        return new JsonPrimitive(src.getName());
+        return new JsonPrimitive(src.name().toLowerCase(Locale.ROOT));
     }
 }
