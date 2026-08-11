@@ -203,7 +203,7 @@ public class ServerRGRuleManager extends RGRuleManager {
             ServerPlayer player = source.getPlayer();
             if (player == null) return false;
             if (!source.getServer().isSingleplayer()) return false;
-            return source.getServer().isSingleplayerOwner(player.getGameProfile());
+            return source.getServer().isSingleplayerOwner(player.nameAndId());
         }
 
         private @NotNull CompletableFuture<Suggestions> suggestRuleCategories(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {

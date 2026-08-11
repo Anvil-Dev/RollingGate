@@ -79,7 +79,7 @@ public class PosUtils {
         player.addEffect(new MobEffectInstance(MobEffects.GLOWING, 200, 0, true, false));
         Vec3 position = player.position();
         ResourceKey<Level> dimension = player.level().dimension();
-        String name = player.getGameProfile().getName();
+        String name = player.getName().getString();
         List<MutableComponent> pos = PosUtils.pos("Shared Location", position.x, position.y, position.z, dimension);
         MutableComponent component = Component.literal("%s at".formatted(name)).append(" ").append(pos.get(0));
         if (pos.size() > 2) component.append("->").append(pos.get(2));

@@ -3,7 +3,7 @@ package dev.anvilcraft.rg.mixin;
 import dev.anvilcraft.rg.api.event.ServerAboutToStopEvent;
 import dev.anvilcraft.rg.api.event.ServerLoadedLevelEvent;
 import net.minecraft.server.MinecraftServer;
-import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,7 +16,7 @@ abstract class MinecraftServerMixin {
         method = "stopServer", at = @At("HEAD")
     )
     private void serverClosed(CallbackInfo ci) {
-        if (!FMLLoader.getDist().isDedicatedServer()) {
+        if (!FMLEnvironment.getDist().isDedicatedServer()) {
             return;
         }
         MinecraftServer server = (MinecraftServer) (Object) this;

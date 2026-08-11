@@ -22,9 +22,9 @@ public class RGRuleChangeEventListener {
     public static void onWindowResizableChange(@NotNull RGRuleChangeEvent.Client<Boolean> event) {
         if (!"windowResizable".equals(event.getRule().name())) return;
         if (event.getNewValue()) {
-            GLFW.glfwSetWindowAttrib(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_RESIZABLE, GLFW.GLFW_TRUE);
+            GLFW.glfwSetWindowAttrib(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_RESIZABLE, GLFW.GLFW_TRUE);
         } else {
-            GLFW.glfwSetWindowAttrib(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_RESIZABLE, GLFW.GLFW_FALSE);
+            GLFW.glfwSetWindowAttrib(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_RESIZABLE, GLFW.GLFW_FALSE);
         }
     }
 }
