@@ -8,7 +8,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.sdl.SDLVideo;
 
 @EventBusSubscriber(modid = RollingGate.MODID, value = Dist.CLIENT)
 public class RGRuleChangeEventListener {
@@ -22,9 +22,9 @@ public class RGRuleChangeEventListener {
     public static void onWindowResizableChange(@NotNull RGRuleChangeEvent.Client<Boolean> event) {
         if (!"windowResizable".equals(event.getRule().name())) return;
         if (event.getNewValue()) {
-            GLFW.glfwSetWindowAttrib(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_RESIZABLE, GLFW.GLFW_TRUE);
+            SDLVideo.SDL_SetWindowResizable(Minecraft.getInstance().getWindow().handle(), true);
         } else {
-            GLFW.glfwSetWindowAttrib(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_RESIZABLE, GLFW.GLFW_FALSE);
+            SDLVideo.SDL_SetWindowResizable(Minecraft.getInstance().getWindow().handle(), false);
         }
     }
 }
