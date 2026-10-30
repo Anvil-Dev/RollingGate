@@ -14,7 +14,6 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 import java.util.function.Function;
@@ -78,7 +77,7 @@ public class RGCodec<T> implements JsonDeserializer<T>, JsonSerializer<T> {
      * @return RGCodec 实例
      */
     @SuppressWarnings("unused")
-    public static <T> @NotNull RGCodec<T> of(Class<T> clazz, Function<String, T> decoder, Function<T, String> encoder) {
+    public static <T> RGCodec<T> of(Class<T> clazz, Function<String, T> decoder, Function<T, String> encoder) {
         return new RGCodec<>(clazz, decoder, encoder, false);
     }
 
@@ -135,7 +134,7 @@ public class RGCodec<T> implements JsonDeserializer<T>, JsonSerializer<T> {
      * @throws JsonParseException JSON解析异常
      */
     @Override
-    public T deserialize(@NotNull JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public T deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         return this.decode(json.getAsString());
     }
 
@@ -148,7 +147,7 @@ public class RGCodec<T> implements JsonDeserializer<T>, JsonSerializer<T> {
      * @return 序列化后的 JSON元素
      */
     @Override
-    public @NotNull JsonElement serialize(T src, Type typeOfSrc, JsonSerializationContext context) {
+    public JsonElement serialize(T src, Type typeOfSrc, JsonSerializationContext context) {
         return new JsonPrimitive(this.encode(src));
     }
 }

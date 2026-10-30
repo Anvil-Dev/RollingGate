@@ -8,16 +8,15 @@ import net.minecraft.commands.Commands;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerPlayer;
-import org.jetbrains.annotations.NotNull;
 
 public class ModCommands {
-    public static @NotNull LiteralArgumentBuilder<CommandSourceStack> root(@NotNull CommandDispatcher<CommandSourceStack> dispatcher, String string) {
+    public static LiteralArgumentBuilder<CommandSourceStack> root(CommandDispatcher<CommandSourceStack> dispatcher, String string) {
         String prefix = "";
         if (dispatcher.getRoot().getChild(string) != null) prefix = "rg";
         return Commands.literal(prefix + string);
     }
 
-    public static @NotNull LiteralArgumentBuilder<CommandSourceStack> root(@NotNull CommandDispatcher<CommandSourceStack> dispatcher, String string, String prefix) {
+    public static LiteralArgumentBuilder<CommandSourceStack> root(CommandDispatcher<CommandSourceStack> dispatcher, String string, String prefix) {
         String _prefix = "";
         if (dispatcher.getRoot().getChild(string) != null) _prefix = prefix;
         return Commands.literal(_prefix + string);

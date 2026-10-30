@@ -12,7 +12,6 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,28 +24,28 @@ public final class RollingGateNetwork {
     private RollingGateNetwork() {
     }
 
-    public static void registerPayloadHandlers(@NotNull RegisterPayloadHandlersEvent event) {
+    public static void registerPayloadHandlers(RegisterPayloadHandlersEvent event) {
         PayloadRegistrar registrar = event.registrar(NETWORK_VERSION).optional();
         registrar.playToServer(ServerRulesHelloPayload.TYPE, ServerRulesHelloPayload.STREAM_CODEC, RollingGateNetwork::handleHello);
         registrar.playToClient(ServerRulesSyncPayload.TYPE, ServerRulesSyncPayload.STREAM_CODEC, ClientboundPayloadHandlers::handleServerRulesSync);
     }
 
-    private static void handleHello(@NotNull ServerRulesHelloPayload payload, @NotNull IPayloadContext context) {
+    private static void handleHello(ServerRulesHelloPayload payload, IPayloadContext context) {
         if (!(context.player() instanceof ServerPlayer player)) return;
         HELLO_PLAYERS.add(player.getUUID());
         PacketDistributor.sendToPlayer(player, new ServerRulesSyncPayload(RollingGate.SERVER_RULE_MANAGER.getSerializedCurrentRules()));
     }
 
-    public static void onServerRuleChange(@NotNull RGRuleChangeEvent.Server<?> event) {
+    public static void onServerRuleChange(RGRuleChangeEvent.Server<?> event) {
         if (event.isCanceled()) return;
         syncRuleToHelloPlayers(event.getRule(), event.getNewValue());
     }
 
-    public static void onPlayerLoggedOut(@NotNull PlayerEvent.PlayerLoggedOutEvent event) {
+    public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
         HELLO_PLAYERS.remove(event.getEntity().getUUID());
     }
 
-    public static void onServerStopped(@NotNull ServerStoppedEvent event) {
+    public static void onServerStopped(ServerStoppedEvent event) {
         HELLO_PLAYERS.clear();
     }
 
@@ -61,11 +60,11 @@ public final class RollingGateNetwork {
         }
     }
 
-    public static void syncRuleToHelloPlayers(@NotNull RGRule<?> rule) {
+    public static void syncRuleToHelloPlayers(RGRule<?> rule) {
         syncRuleToHelloPlayers(rule, rule.getValue());
     }
 
-    public static <T> void syncRuleToHelloPlayers(@NotNull RGRule<T> rule, Object value) {
+    public static <T> void syncRuleToHelloPlayers(RGRule<T> rule, Object value) {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server == null) return;
         ServerRulesSyncPayload payload = ServerRulesSyncPayload.single(rule.serialize(), rule.codec().encode(rule.type().cast(value)));

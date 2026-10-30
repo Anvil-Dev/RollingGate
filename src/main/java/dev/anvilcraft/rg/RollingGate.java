@@ -3,7 +3,7 @@ package dev.anvilcraft.rg;
 import com.mojang.logging.LogUtils;
 import dev.anvilcraft.rg.api.server.ServerRGRuleManager;
 import dev.anvilcraft.rg.network.RollingGateNetwork;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -13,7 +13,6 @@ import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.lang.reflect.InvocationTargetException;
@@ -25,7 +24,7 @@ public class RollingGate {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final ServerRGRuleManager SERVER_RULE_MANAGER = new ServerRGRuleManager(RollingGate.MODID);
 
-    public RollingGate(@NotNull IEventBus modEventBus, @SuppressWarnings("unused") @NotNull ModContainer modContainer) throws ClassNotFoundException {
+    public RollingGate(IEventBus modEventBus, @SuppressWarnings("unused") ModContainer modContainer) throws ClassNotFoundException {
         modEventBus.addListener(RollingGateNetwork::registerPayloadHandlers);
         NeoForge.EVENT_BUS.addListener(this::onServerStarting);
         NeoForge.EVENT_BUS.addListener(this::registerCommand);
@@ -45,16 +44,16 @@ public class RollingGate {
     }
 
     @SubscribeEvent
-    public void onServerStarting(@NotNull ServerStartingEvent event) {
+    public void onServerStarting(ServerStartingEvent event) {
         RollingGate.SERVER_RULE_MANAGER.reInit(event.getServer());
     }
 
     @SubscribeEvent
-    public void registerCommand(@NotNull RegisterCommandsEvent event) {
+    public void registerCommand(RegisterCommandsEvent event) {
         RollingGate.SERVER_RULE_MANAGER.generateCommand(event.getDispatcher(), MODID, "rg");
     }
 
-    public static @NotNull ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MODID, path);
+    public static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MODID, path);
     }
 }

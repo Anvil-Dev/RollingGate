@@ -6,7 +6,6 @@ import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.FilteredText;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import org.jetbrains.annotations.NotNull;
 
 public class ServerPlayerChatEvent extends PlayerEvent {
     private final ServerPlayer player;
@@ -26,7 +25,7 @@ public class ServerPlayerChatEvent extends PlayerEvent {
     }
 
     @Override
-    public @NotNull ServerPlayer getEntity() {
+    public ServerPlayer getEntity() {
         return this.player;
     }
 }

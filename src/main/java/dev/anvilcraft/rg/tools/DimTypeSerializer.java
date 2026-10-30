@@ -9,23 +9,22 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 
 public class DimTypeSerializer implements JsonSerializer<ResourceKey<Level>>, JsonDeserializer<ResourceKey<Level>> {
     @Override
-    public ResourceKey<Level> deserialize(@NotNull JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public ResourceKey<Level> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         return ResourceKey.create(
             Registries.DIMENSION,
-            ResourceLocation.parse(json.getAsString())
+            Identifier.parse(json.getAsString())
         );
     }
 
     @Override
-    public JsonElement serialize(@NotNull ResourceKey<Level> src, Type typeOfSrc, JsonSerializationContext context) {
-        return new JsonPrimitive(src.location().toString());
+    public JsonElement serialize(ResourceKey<Level> src, Type typeOfSrc, JsonSerializationContext context) {
+        return new JsonPrimitive(src.identifier().toString());
     }
 }

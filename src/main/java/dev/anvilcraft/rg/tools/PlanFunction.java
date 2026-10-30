@@ -6,7 +6,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,7 +24,7 @@ public class PlanFunction {
     }
 
     @SubscribeEvent
-    public static void onServerTick(@NotNull ServerTickEvent.Post event) {
+    public static void onServerTick(ServerTickEvent.Post event) {
         if (PlanFunction.PLAN_FUNCTION.isEmpty()) return;
         MinecraftServer server = event.getServer();
         ServerLevel level = server.overworld();

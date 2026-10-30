@@ -5,7 +5,6 @@ import dev.anvilcraft.rg.RollingGate;
 import dev.anvilcraft.rg.RollingGateServerRules;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +32,7 @@ public class TranslationUtil {
      * @param args 可选格式替换参数
      * @return 翻译和格式化的文本
      */
-    public static @NotNull MutableComponent trans(String key, Object... args) {
+    public static MutableComponent trans(String key, Object... args) {
         return Component.translatableWithFallback(
             key,
             LANGUAGES.getOrDefault(

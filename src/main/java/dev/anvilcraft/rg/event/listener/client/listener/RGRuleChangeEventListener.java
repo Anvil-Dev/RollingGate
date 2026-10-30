@@ -7,19 +7,18 @@ import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 @EventBusSubscriber(modid = RollingGate.MODID, value = Dist.CLIENT)
 public class RGRuleChangeEventListener {
     @SubscribeEvent
-    public static void onRuleChange(@NotNull RGRuleChangeEvent.Client<?> event) {
+    public static void onRuleChange(RGRuleChangeEvent.Client<?> event) {
         RollingGateClient.CLIENT_RULE_MANAGER.onRuleChange(event.getRule(), event.getOldValue(), event.getNewValue());
     }
 
 
     @SubscribeEvent
-    public static void onWindowResizableChange(@NotNull RGRuleChangeEvent.Client<Boolean> event) {
+    public static void onWindowResizableChange(RGRuleChangeEvent.Client<Boolean> event) {
         if (!"windowResizable".equals(event.getRule().name())) return;
         if (event.getNewValue()) {
             GLFW.glfwSetWindowAttrib(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_RESIZABLE, GLFW.GLFW_TRUE);

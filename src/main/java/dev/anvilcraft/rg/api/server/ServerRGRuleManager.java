@@ -35,7 +35,6 @@ import net.neoforged.fml.loading.progress.StartupNotificationManager;
 import net.neoforged.neoforgespi.language.IModInfo;
 import net.neoforged.neoforgespi.language.ModFileScanData;
 import org.apache.commons.lang3.function.TriFunction;
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.ElementType;
 import java.util.Arrays;
@@ -103,7 +102,7 @@ public class ServerRGRuleManager extends RGRuleManager {
      * @param value  规则的值
      * @param <T>    规则值的类型
      */
-    public <T> void setWorldConfig(@NotNull MinecraftServer server, @NotNull RGRule<T> rule, T value) {
+    public <T> void setWorldConfig(MinecraftServer server, RGRule<T> rule, T value) {
         this.worldConfig.put(rule, value);
         ConfigUtil.writeContent(server.getWorldPath(worldConfigPath), GSON.toJson(this.getSerializedConfig(this.worldConfig)));
         RollingGateNetwork.syncRuleToHelloPlayers(rule);
@@ -115,7 +114,7 @@ public class ServerRGRuleManager extends RGRuleManager {
      *
      * @param server 服务器实例，用于访问世界路径
      */
-    public void reInit(@NotNull MinecraftServer server) {
+    public void reInit(MinecraftServer server) {
         super.reInit();
         this.worldConfig.clear();
         Map<RGRule<?>, Object> world = this.setSaveRules(ConfigUtil.getOrCreateContent(server.getWorldPath(worldConfigPath)));
@@ -139,7 +138,7 @@ public class ServerRGRuleManager extends RGRuleManager {
      * @param literal    命令的字面量
      */
     @SuppressWarnings("unused")
-    public void generateCommand(CommandDispatcher<CommandSourceStack> dispatcher, @NotNull String literal) {
+    public void generateCommand(CommandDispatcher<CommandSourceStack> dispatcher, String literal) {
         this.generateCommand(dispatcher, literal, null);
     }
 
@@ -152,17 +151,17 @@ public class ServerRGRuleManager extends RGRuleManager {
      * @param redirect   命令的重定向路径，可以为null
      */
     @SuppressWarnings("unused")
-    public void generateCommand(CommandDispatcher<CommandSourceStack> dispatcher, @NotNull String literal, String redirect) {
+    public void generateCommand(CommandDispatcher<CommandSourceStack> dispatcher, String literal, String redirect) {
         new Command(dispatcher, literal, redirect).generateCommand();
     }
 
 
     private class Command {
-        @NotNull CommandDispatcher<CommandSourceStack> dispatcher;
-        @NotNull String literal;
+        CommandDispatcher<CommandSourceStack> dispatcher;
+        String literal;
         String redirect;
 
-        private Command(@NotNull CommandDispatcher<CommandSourceStack> dispatcher, @NotNull String literal, String redirect) {
+        private Command(CommandDispatcher<CommandSourceStack> dispatcher, String literal, String redirect) {
             this.dispatcher = dispatcher;
             this.literal = literal;
             this.redirect = redirect;
@@ -197,8 +196,8 @@ public class ServerRGRuleManager extends RGRuleManager {
             );
         }
 
-        private boolean checkPermission(@NotNull CommandSourceStack source) {
-            if (source.hasPermission(Commands.LEVEL_GAMEMASTERS)) return true;
+        private boolean checkPermission(CommandSourceStack source) {
+            if (Commands.LEVEL_GAMEMASTERS.check(source.permissions())) return true;
             if (!source.isPlayer()) return false;
             ServerPlayer player = source.getPlayer();
             if (player == null) return false;
@@ -206,7 +205,7 @@ public class ServerRGRuleManager extends RGRuleManager {
             return source.getServer().isSingleplayerOwner(player.nameAndId());
         }
 
-        private @NotNull CompletableFuture<Suggestions> suggestRuleCategories(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
+        private CompletableFuture<Suggestions> suggestRuleCategories(final CommandContext<CommandSourceStack> context, final SuggestionsBuilder builder) {
             return SharedSuggestionProvider.suggest(categories, builder);
         }
 
@@ -224,14 +223,14 @@ public class ServerRGRuleManager extends RGRuleManager {
             }
         }
 
-        private int reloadCommand(@NotNull CommandContext<CommandSourceStack> context) {
+        private int reloadCommand(CommandContext<CommandSourceStack> context) {
             reInit(context.getSource().getServer());
             RollingGateNetwork.syncRulesToHelloPlayers();
             context.getSource().sendSuccess(() -> TranslationUtil.trans("rolling_gate.command.reload.success").withStyle(ChatFormatting.GREEN), false);
             return 1;
         }
 
-        private int listCommand(@NotNull CommandContext<CommandSourceStack> context) {
+        private int listCommand(CommandContext<CommandSourceStack> context) {
             Optional<? extends ModContainer> container = ModList.get().getModContainerById(managerNamespace);
             if (container.isPresent()) {
                 IModInfo info = container.get().getModInfo();
@@ -257,7 +256,7 @@ public class ServerRGRuleManager extends RGRuleManager {
             return 0;
         }
 
-        private <T> int ruleInfoCommand(@NotNull CommandContext<CommandSourceStack> context, @NotNull RGRule<T> rule) {
+        private <T> int ruleInfoCommand(CommandContext<CommandSourceStack> context, RGRule<T> rule) {
             CommandSourceStack source = context.getSource();
             source.sendSuccess(() -> TranslationUtil.trans(rule.getNameTranslationKey()), false);
             source.sendSuccess(() -> TranslationUtil.trans(rule.getDescriptionTranslationKey()), false);
@@ -265,7 +264,7 @@ public class ServerRGRuleManager extends RGRuleManager {
             return 1;
         }
 
-        private <T> @NotNull MutableComponent getValues(@NotNull RGRule<T> rule) {
+        private <T> MutableComponent getValues(RGRule<T> rule) {
             MutableComponent result = Component.empty();
             String string1 = rule.getValue().toString();
             boolean flag = false;
@@ -310,7 +309,7 @@ public class ServerRGRuleManager extends RGRuleManager {
             return result;
         }
 
-        private int categoryCommand(@NotNull CommandContext<CommandSourceStack> context) {
+        private int categoryCommand(CommandContext<CommandSourceStack> context) {
             String category = StringArgumentType.getString(context, "category");
             MutableComponent categoryComponent = TranslationUtil.trans(getDescriptionCategoryKey(category)).append(":");
             context.getSource().sendSuccess(() -> categoryComponent, false);
@@ -328,7 +327,7 @@ public class ServerRGRuleManager extends RGRuleManager {
             return 1;
         }
 
-        private <T> int setRuleCommand(@NotNull CommandContext<CommandSourceStack> context, @NotNull RGRule<T> rule, String value) {
+        private <T> int setRuleCommand(CommandContext<CommandSourceStack> context, RGRule<T> rule, String value) {
             try {
                 rule.setFieldValue(value);
                 MutableComponent result = TranslationUtil
@@ -351,7 +350,7 @@ public class ServerRGRuleManager extends RGRuleManager {
             }
         }
 
-        private <T> int defaultRuleCommand(@NotNull CommandContext<CommandSourceStack> context, @NotNull RGRule<T> rule, String value) {
+        private <T> int defaultRuleCommand(CommandContext<CommandSourceStack> context, RGRule<T> rule, String value) {
             try {
                 setWorldConfig(context.getSource().getServer(), rule, rule.codec().decode(value));
                 MutableComponent result = TranslationUtil

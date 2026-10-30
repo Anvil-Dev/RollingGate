@@ -1,6 +1,5 @@
 package dev.anvilcraft.rg.api;
 
-import org.jetbrains.annotations.NotNull;
 
 /**
  * 自定义运行时异常类，用于表示规则引擎中的规则相关错误
@@ -32,7 +31,7 @@ public class RGRuleException extends RuntimeException {
      * @param name 字段名
      * @return 创建的异常实例
      */
-    public static @NotNull RGRuleException illegalAccess(@NotNull String name) {
+    public static RGRuleException illegalAccess(String name) {
         return new RGRuleException("Field %s has illegal access", name);
     }
 
@@ -42,7 +41,7 @@ public class RGRuleException extends RuntimeException {
      * @param name 字段名
      * @return 创建的异常实例
      */
-    public static @NotNull RGRuleException notStatic(@NotNull String name) {
+    public static RGRuleException notStatic(String name) {
         return new RGRuleException("Field %s is not static", name);
     }
 
@@ -52,7 +51,7 @@ public class RGRuleException extends RuntimeException {
      * @param name 字段名
      * @return 创建的异常实例
      */
-    public static @NotNull RGRuleException notPublic(@NotNull String name) {
+    public static RGRuleException notPublic(String name) {
         return new RGRuleException("Field %s is not public", name);
     }
 
@@ -62,7 +61,7 @@ public class RGRuleException extends RuntimeException {
      * @param name 字段名
      * @return 创建的异常实例
      */
-    public static @NotNull RGRuleException beFinal(@NotNull String name) {
+    public static RGRuleException beFinal(String name) {
         return new RGRuleException("Field %s can't be final", name);
     }
 
@@ -72,7 +71,7 @@ public class RGRuleException extends RuntimeException {
      * @param name 字段名
      * @return 创建的异常实例
      */
-    public static @NotNull RGRuleException createRuleFailed(@NotNull String name) {
+    public static RGRuleException createRuleFailed(String name) {
         return new RGRuleException("Failed to create rule for field %s", name);
     }
 
@@ -83,7 +82,7 @@ public class RGRuleException extends RuntimeException {
      * @param type 字段类型
      * @return 创建的异常实例
      */
-    public static @NotNull RGRuleException unsupportedType(@NotNull String name, @NotNull Class<?> type) {
+    public static RGRuleException unsupportedType(String name, Class<?> type) {
         return new RGRuleException("Field %s has unsupported type, this type can only be boolean, byte, int, long, float, double, String, but got %s", name, type.getTypeName());
     }
 }

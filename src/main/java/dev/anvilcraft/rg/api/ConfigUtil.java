@@ -3,7 +3,6 @@ package dev.anvilcraft.rg.api;
 import com.google.gson.JsonObject;
 import net.minecraft.util.GsonHelper;
 import org.apache.commons.io.FileUtils;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +22,7 @@ public class ConfigUtil {
      * @return 返回从文件读取的JSON对象，如果文件不存在，则返回一个新的空JsonObject
      * @throws RGRuleException 如果读取文件失败，则抛出异常并说明原因
      */
-    public static @NotNull JsonObject getOrCreateContent(@NotNull Path path) {
+    public static JsonObject getOrCreateContent(Path path) {
         File file = path.toFile();
         try {
             if (!file.exists() || file.isDirectory()) {
@@ -47,7 +46,7 @@ public class ConfigUtil {
      * @param content 要写入的内容，不能为空
      * @throws RGRuleException 如果写入文件失败，则抛出异常并说明原因
      */
-    public static void writeContent(@NotNull Path path, @NotNull String content) {
+    public static void writeContent(Path path, String content) {
         try {
             // 将指定内容写入文件
             FileUtils.writeStringToFile(path.toFile(), content, StandardCharsets.UTF_8);

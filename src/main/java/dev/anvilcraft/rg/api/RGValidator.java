@@ -2,7 +2,6 @@ package dev.anvilcraft.rg.api;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +23,7 @@ public interface RGValidator<T> {
      * @return 如果新值有效则返回true，否则返回false
      */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    boolean validate(@NotNull T oldValue, @NotNull String newValue);
+    boolean validate(T oldValue, String newValue);
 
     /**
      * 输入值非法的原因
@@ -40,7 +39,7 @@ public interface RGValidator<T> {
      */
     class StringValidator implements RGValidator<String> {
         @Override
-        public boolean validate(@NotNull String oldValue, @NotNull String newValue) {
+        public boolean validate(String oldValue, String newValue) {
             return !newValue.isEmpty();
         }
 
@@ -61,7 +60,7 @@ public interface RGValidator<T> {
         }
 
         @Override
-        public boolean validate(@NotNull String oldValue, @NotNull String newValue) {
+        public boolean validate(String oldValue, String newValue) {
             return super.validate(oldValue, newValue) && getSet().contains(newValue);
         }
 
@@ -76,7 +75,7 @@ public interface RGValidator<T> {
      */
     class BooleanValidator implements RGValidator<Boolean> {
         @Override
-        public boolean validate(@NotNull Boolean oldValue, @NotNull String newValue) {
+        public boolean validate(Boolean oldValue, String newValue) {
             return newValue.equals("true") || newValue.equals("false");
         }
 
@@ -98,7 +97,7 @@ public interface RGValidator<T> {
          *
          * @return 包含最小值和最大值的Map.Entry对象
          */
-        public abstract @NotNull Map.Entry<T, T> getRange();
+        public abstract Map.Entry<T, T> getRange();
 
         /**
          * 获取数字是否包含在范围内
@@ -110,7 +109,7 @@ public interface RGValidator<T> {
         }
 
         @Override
-        public boolean validate(@NotNull T oldValue, @NotNull String newValue) {
+        public boolean validate(T oldValue, String newValue) {
             try {
                 T value = parse(newValue);
                 boolean flag1 = containsRange().getKey() ? value.doubleValue() >= getRange().getKey().doubleValue() : value.doubleValue() > getRange().getKey().doubleValue();
@@ -132,14 +131,14 @@ public interface RGValidator<T> {
          * @param newValue 待解析的字符串
          * @return 解析后的数字
          */
-        protected abstract T parse(@NotNull String newValue);
+        protected abstract T parse(String newValue);
     }
 
     /**
      * ByteValidator 抽象类继承自 NumberValidator ，用于 byte 类型的数字验证
      */
     abstract class ByteValidator extends NumberValidator<Byte> {
-        protected Byte parse(@NotNull String newValue) {
+        protected Byte parse(String newValue) {
             return Byte.parseByte(newValue);
         }
     }
@@ -148,7 +147,7 @@ public interface RGValidator<T> {
      * ShortValidator 抽象类继承自 NumberValidator ，用于 short 类型的数字验证
      */
     abstract class ShortValidator extends NumberValidator<Short> {
-        protected Short parse(@NotNull String newValue) {
+        protected Short parse(String newValue) {
             return Short.parseShort(newValue);
         }
     }
@@ -157,7 +156,7 @@ public interface RGValidator<T> {
      * IntegerValidator 抽象类继承自 NumberValidator ，用于 int 类型的数字验证
      */
     abstract class IntegerValidator extends NumberValidator<Integer> {
-        protected Integer parse(@NotNull String newValue) {
+        protected Integer parse(String newValue) {
             return Integer.parseInt(newValue);
         }
     }
@@ -166,7 +165,7 @@ public interface RGValidator<T> {
      * LongValidator 抽象类继承自 NumberValidator ，用于 long 类型的数字验证
      */
     abstract class LongValidator extends NumberValidator<Long> {
-        protected Long parse(@NotNull String newValue) {
+        protected Long parse(String newValue) {
             return Long.parseLong(newValue);
         }
     }
@@ -175,7 +174,7 @@ public interface RGValidator<T> {
      * FloatValidator 抽象类继承自 NumberValidator ，用于 float 类型的数字验证
      */
     abstract class FloatValidator extends NumberValidator<Float> {
-        protected Float parse(@NotNull String newValue) {
+        protected Float parse(String newValue) {
             return Float.parseFloat(newValue);
         }
     }
@@ -184,7 +183,7 @@ public interface RGValidator<T> {
      * DoubleValidator 抽象类继承自 NumberValidator ，用于 double 类型的数字验证
      */
     abstract class DoubleValidator extends NumberValidator<Double> {
-        protected Double parse(@NotNull String newValue) {
+        protected Double parse(String newValue) {
             return Double.parseDouble(newValue);
         }
     }
@@ -210,7 +209,7 @@ public interface RGValidator<T> {
          *
          * @return 权限级别字符串数组
          */
-        public static String @NotNull [] getPermissionLevels() {
+        public static String [] getPermissionLevels() {
             return new String[]{"ops", "true", "false", "0", "1", "2", "3", "4"};
         }
 
@@ -222,14 +221,14 @@ public interface RGValidator<T> {
          * @param stack    命令源堆栈，用于检查权限级别
          * @return 如果供应商提供的命令规则满足权限级别，则返回true，否则返回false
          */
-        public static boolean hasPermission(@NotNull Supplier<?> supplier, @NotNull CommandSourceStack stack) {
+        public static boolean hasPermission(Supplier<?> supplier, CommandSourceStack stack) {
             String s = String.valueOf(supplier.get());
             return switch (s) {
-                case "0" -> stack.hasPermission(Commands.LEVEL_ALL);
-                case "1" -> stack.hasPermission(Commands.LEVEL_MODERATORS);
-                case "ops", "2" -> stack.hasPermission(Commands.LEVEL_GAMEMASTERS);
-                case "3" -> stack.hasPermission(Commands.LEVEL_ADMINS);
-                case "4" -> stack.hasPermission(Commands.LEVEL_OWNERS);
+                case "0" -> Commands.LEVEL_ALL.check(stack.permissions());
+                case "1" -> Commands.LEVEL_MODERATORS.check(stack.permissions());
+                case "ops", "2" -> Commands.LEVEL_GAMEMASTERS.check(stack.permissions());
+                case "3" -> Commands.LEVEL_ADMINS.check(stack.permissions());
+                case "4" -> Commands.LEVEL_OWNERS.check(stack.permissions());
                 case "true", "TRUE" -> true;
                 default -> false;
             };

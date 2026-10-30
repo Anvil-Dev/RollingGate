@@ -6,8 +6,7 @@ import dev.anvilcraft.rg.api.event.RGRuleChangeEvent;
 import dev.anvilcraft.rg.api.event.RGValidatorNotPassedEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.lang.reflect.Field;
@@ -70,7 +69,7 @@ public record RGRule<T>(
      * @throws RGRuleException 如果配置项不合法或不支持，则抛出此异常
      */
     @SuppressWarnings("unchecked")
-    public static <T> @Nullable RGRule<T> of(String namespace, @NotNull Field field) {
+    public static <T> @Nullable RGRule<T> of(String namespace, Field field) {
         String name = field.getName();
         Rule rule = field.getAnnotation(Rule.class);
         // 确保配置项上有Rule注解
@@ -116,7 +115,7 @@ public record RGRule<T>(
                 int max = (int) RGRule.getRuleMax(rule.max(), rgCodec);
                 validators.add((RGValidator<T>) new RGValidator.IntegerValidator() {
                     @Override
-                    public Map.@NotNull Entry<Integer, Integer> getRange() {
+                    public Map.Entry<Integer, Integer> getRange() {
                         return Map.entry(min, max);
                     }
                 });
@@ -125,7 +124,7 @@ public record RGRule<T>(
                 double max = (double) RGRule.getRuleMax(rule.max(), rgCodec);
                 validators.add((RGValidator<T>) new RGValidator.DoubleValidator() {
                     @Override
-                    public Map.@NotNull Entry<Double, Double> getRange() {
+                    public Map.Entry<Double, Double> getRange() {
                         return Map.entry(min, max);
                     }
                 });
@@ -134,7 +133,7 @@ public record RGRule<T>(
                 float max = (float) RGRule.getRuleMax(rule.max(), rgCodec);
                 validators.add((RGValidator<T>) new RGValidator.FloatValidator() {
                     @Override
-                    public Map.@NotNull Entry<Float, Float> getRange() {
+                    public Map.Entry<Float, Float> getRange() {
                         return Map.entry(min, max);
                     }
                 });
@@ -143,7 +142,7 @@ public record RGRule<T>(
                 short max = (short) RGRule.getRuleMax(rule.max(), rgCodec);
                 validators.add((RGValidator<T>) new RGValidator.ShortValidator() {
                     @Override
-                    public Map.@NotNull Entry<Short, Short> getRange() {
+                    public Map.Entry<Short, Short> getRange() {
                         return Map.entry(min, max);
                     }
                 });
@@ -152,7 +151,7 @@ public record RGRule<T>(
                 byte max = (byte) RGRule.getRuleMax(rule.max(), rgCodec);
                 validators.add((RGValidator<T>) new RGValidator.ByteValidator() {
                     @Override
-                    public Map.@NotNull Entry<Byte, Byte> getRange() {
+                    public Map.Entry<Byte, Byte> getRange() {
                         return Map.entry(min, max);
                     }
                 });
@@ -161,7 +160,7 @@ public record RGRule<T>(
                 long max = (long) RGRule.getRuleMax(rule.max(), rgCodec);
                 validators.add((RGValidator<T>) new RGValidator.LongValidator() {
                     @Override
-                    public Map.@NotNull Entry<Long, Long> getRange() {
+                    public Map.Entry<Long, Long> getRange() {
                         return Map.entry(min, max);
                     }
                 });
@@ -188,7 +187,7 @@ public record RGRule<T>(
         }
     }
 
-    public static Object getRuleMin(String min, @NotNull RGCodec<?> rgCodec) {
+    public static Object getRuleMin(String min, RGCodec<?> rgCodec) {
         if (Number.class.isAssignableFrom(rgCodec.clazz())) {
             if (rgCodec.clazz() == Integer.class) {
                 return "-inf".equals(min) ? Integer.MIN_VALUE : (int) rgCodec.decode(min);
@@ -207,7 +206,7 @@ public record RGRule<T>(
         throw new UnsupportedOperationException("Unsupported type: " + rgCodec.clazz());
     }
 
-    public static Object getRuleMax(String max, @NotNull RGCodec<?> rgCodec) {
+    public static Object getRuleMax(String max, RGCodec<?> rgCodec) {
         if (Number.class.isAssignableFrom(rgCodec.clazz())) {
             if (rgCodec.clazz() == Integer.class) {
                 return "inf".equals(max) ? Integer.MAX_VALUE : (int) rgCodec.decode(max);
@@ -231,7 +230,7 @@ public record RGRule<T>(
      *
      * @return 配置项的名称
      */
-    public @NotNull String name() {
+    public String name() {
         return this.field.getName();
     }
 
@@ -250,7 +249,7 @@ public record RGRule<T>(
         }
     }
 
-    public @NotNull @Unmodifiable List<T> getTypedAllowed() {
+    public @Unmodifiable List<T> getTypedAllowed() {
         return Arrays.stream(this.allowed).map(this.codec::decode).toList();
     }
 
@@ -267,7 +266,7 @@ public record RGRule<T>(
      * @return 与字段类型对应的包装类，或者在不支持该类型时抛出RuntimeException异常
      * @throws RuntimeException 当字段的类型不被支持时抛出
      */
-    public static Class<?> checkType(@NotNull Field field) {
+    public static Class<?> checkType(Field field) {
         RGCodec<?> rgCodec = CODECS.getOrDefault(field.getType().getTypeName(), null);
         if (rgCodec != null) return rgCodec.clazz();
         throw RGRuleException.unsupportedType(field.getName(), field.getType());
@@ -283,7 +282,7 @@ public record RGRule<T>(
      * @param str 待检查的序列化字符串
      * @throws RuntimeException 如果字符串为空或不符合指定的格式，抛出此异常
      */
-    public static void checkSerialize(@NotNull String str) {
+    public static void checkSerialize(String str) {
         // 检查字符串是否为空或不符合预期的格式
         if (str.isEmpty() || !str.matches("^[a-z][a-z0-9_]*$")) {
             // 如果检查失败，抛出异常，说明字符串无效
@@ -299,7 +298,7 @@ public record RGRule<T>(
      * @param str 驼峰命名法的字符串
      * @return 转换后的蛇形命名法的字符串
      */
-    public static @NotNull String caseToSnake(@NotNull String str) {
+    public static String caseToSnake(String str) {
         // 使用正则表达式匹配驼峰命名法中的大写字母，并在其前添加下划线，然后将整个字符串转换为小写
         return str.replaceAll("([a-z])([A-Z]+)", "$1_$2").toLowerCase();
     }
@@ -362,7 +361,7 @@ public record RGRule<T>(
      *
      * @return 返回格式化的名称翻译键字符串，包括命名空间和序列化字段
      */
-    public @NotNull String getNameTranslationKey() {
+    public String getNameTranslationKey() {
         // 使用formatted方法格式化名称翻译键
         return "%s.rolling_gate.rule.%s".formatted(this.namespace, this.serialize);
     }
@@ -372,7 +371,7 @@ public record RGRule<T>(
      *
      * @return 返回格式化的描述翻译键字符串，包括命名空间和序列化字段
      */
-    public @NotNull String getDescriptionTranslationKey() {
+    public String getDescriptionTranslationKey() {
         // 使用String.format方法构建描述翻译键，包含命名空间和序列化值
         return "%s.rolling_gate.rule.%s.desc".formatted(this.namespace, this.serialize);
     }

@@ -7,7 +7,6 @@ import com.google.gson.JsonObject;
 import dev.anvilcraft.rg.RollingGate;
 import lombok.Setter;
 import net.neoforged.fml.loading.FMLPaths;
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.nio.file.Path;
@@ -59,7 +58,7 @@ public class RGRuleManager {
      * @param namespace   命名空间
      * @param environment 环境对象
      */
-    public RGRuleManager(String namespace, @NotNull RGEnvironment environment) {
+    public RGRuleManager(String namespace, RGEnvironment environment) {
         this.managerNamespace = namespace;
         this.environment = environment;
         // 根据命名空间和环境确定全局配置文件路径
@@ -72,7 +71,7 @@ public class RGRuleManager {
      * @param config 配置文件内容
      * @return 返回设置后的规则映射表
      */
-    protected @NotNull Map<RGRule<?>, Object> setSaveRules(@NotNull JsonObject config) {
+    protected Map<RGRule<?>, Object> setSaveRules(JsonObject config) {
         Map<RGRule<?>, Object> result = new HashMap<>();
         // 遍历配置文件中的每个规则
         for (Map.Entry<String, JsonElement> entry : config.entrySet()) {
@@ -94,7 +93,7 @@ public class RGRuleManager {
      * @param configs 配置映射表
      * @return 返回序列化后的配置映射表
      */
-    protected @NotNull Map<String, Object> getSerializedConfig(@NotNull Map<RGRule<?>, Object> configs) {
+    protected Map<String, Object> getSerializedConfig(Map<RGRule<?>, Object> configs) {
         Map<String, Object> result = new HashMap<>();
         // 遍历配置映射表，序列化每个规则
         for (Map.Entry<RGRule<?>, Object> entry : configs.entrySet()) {
@@ -107,7 +106,7 @@ public class RGRuleManager {
     /**
      * 重新初始化全局配置
      */
-    public @NotNull Map<String, String> getSerializedCurrentRules() {
+    public Map<String, String> getSerializedCurrentRules() {
         Map<String, String> result = new HashMap<>();
         for (Map.Entry<String, RGRule<?>> entry : this.rules.entrySet()) {
             RGRule<?> rule = entry.getValue();
@@ -116,7 +115,7 @@ public class RGRuleManager {
         return result;
     }
 
-    public void applySerializedRules(@NotNull Map<String, String> rules) {
+    public void applySerializedRules(Map<String, String> rules) {
         for (Map.Entry<String, String> entry : rules.entrySet()) {
             this.applySerializedRule(entry.getKey(), entry.getValue());
         }
@@ -138,15 +137,15 @@ public class RGRuleManager {
         }
     }
 
-    private <T> @NotNull String encodeRuleValue(@NotNull RGRule<T> rule) {
+    private <T> String encodeRuleValue(RGRule<T> rule) {
         return rule.codec().encode(rule.getValue());
     }
 
-    private <T> void applySerializedRule(@NotNull RGRule<T> rule, String value) {
+    private <T> void applySerializedRule(RGRule<T> rule, String value) {
         this.setRuleValue(rule, rule.codec().decode(value));
     }
 
-    private <T> void setRuleValue(@NotNull RGRule<T> rule, Object value) {
+    private <T> void setRuleValue(RGRule<T> rule, Object value) {
         try {
             rule.field().set(null, rule.type().cast(value));
         } catch (IllegalAccessException e) {
@@ -165,7 +164,7 @@ public class RGRuleManager {
      *
      * @param rule 要添加的规则
      */
-    public void addRule(@NotNull RGRule<?> rule) {
+    public void addRule(RGRule<?> rule) {
         this.rules.put(rule.serialize(), rule);
         // 添加规则的类别到类别列表
         this.categories.addAll(Arrays.asList(rule.categories()));
@@ -178,7 +177,7 @@ public class RGRuleManager {
      * @param rules     规则类
      * @return 返回创建的规则列表
      */
-    private static @NotNull List<RGRule<?>> of(String namespace, @NotNull Class<?> rules) {
+    private static List<RGRule<?>> of(String namespace, Class<?> rules) {
         List<RGRule<?>> ruleList = new ArrayList<>();
         // 遍历规则类的每个字段
         for (Field field : rules.getDeclaredFields()) {
@@ -215,7 +214,7 @@ public class RGRuleManager {
      * @param category 分组名称
      * @return 返回格式化的分组翻译键字符串
      */
-    public @NotNull String getDescriptionCategoryKey(String category) {
+    public String getDescriptionCategoryKey(String category) {
         // 使用String.format方法构建描述翻译键，包含命名空间和序列化值
         return "rolling_gate.category.%s".formatted(category);
     }

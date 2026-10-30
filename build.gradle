@@ -26,7 +26,7 @@ repositories {
 }
 
 base {
-    archivesName = mod_name + "-neoforge-1.21.10"
+    archivesName = mod_name + "-neoforge-1.21.11"
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(java_version)
@@ -145,4 +145,9 @@ lombok {
 
 tasks.named('jar', Jar) {
     archiveFileName = "${mod_id}-${version}-mc${minecraft_version}.jar"
+}
+
+tasks.withType(Jar).configureEach {
+    archiveBaseName = mod_id
+    archiveVersion = "${version}-mc${minecraft_version}"
 }

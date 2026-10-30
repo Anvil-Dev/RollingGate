@@ -11,14 +11,13 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.List;
 
 @SuppressWarnings("unused")
 public class PosUtils {
-    public static @NotNull MutableComponent xaero(String desc, double x, double y, double z, @NotNull ResourceKey<Level> dimType) {
+    public static MutableComponent xaero(String desc, double x, double y, double z, ResourceKey<Level> dimType) {
         int color = dimType == Level.OVERWORLD ? 10 :
             dimType == Level.NETHER ? 12 :
                 dimType == Level.END ? 13 : 11;
@@ -31,12 +30,12 @@ public class PosUtils {
                     y,
                     z,
                     color,
-                    dimType.location().getPath()
+                    dimType.identifier().getPath()
                 )
         );
     }
 
-    public static @NotNull @Unmodifiable List<MutableComponent> pos(String desc, double x, double y, double z, @NotNull ResourceKey<Level> dimension) {
+    public static @Unmodifiable List<MutableComponent> pos(String desc, double x, double y, double z, ResourceKey<Level> dimension) {
         MutableComponent pos = Component.literal("[%.1f, %.1f, %.1f]".formatted(x, y, z)).withStyle(
             Style.EMPTY
                 .applyFormat(
@@ -48,7 +47,7 @@ public class PosUtils {
                                 ChatFormatting.LIGHT_PURPLE :
                                 ChatFormatting.AQUA
                 )
-                .withHoverEvent(new HoverEvent.ShowText(Component.literal(dimension.location().toString())))
+                .withHoverEvent(new HoverEvent.ShowText(Component.literal(dimension.identifier().toString())))
         );
         double scale = 0;
         ResourceKey<Level> toDimension = Level.END;
@@ -68,14 +67,14 @@ public class PosUtils {
                             ChatFormatting.GREEN :
                             ChatFormatting.AQUA
                 )
-                .withHoverEvent(new HoverEvent.ShowText(Component.literal(toDimension.location().toString())))
+                .withHoverEvent(new HoverEvent.ShowText(Component.literal(toDimension.identifier().toString())))
         );
         return scale > 0 ?
             List.of(pos, xaero(desc, x, y, z, dimension), toPos, xaero(desc, x * scale, y, z * scale, toDimension)) :
             List.of(pos, xaero(desc, x, y, z, dimension));
     }
 
-    public static @NotNull @Unmodifiable List<MutableComponent> playerPos(@NotNull ServerPlayer player) {
+    public static @Unmodifiable List<MutableComponent> playerPos(ServerPlayer player) {
         player.addEffect(new MobEffectInstance(MobEffects.GLOWING, 200, 0, true, false));
         Vec3 position = player.position();
         ResourceKey<Level> dimension = player.level().dimension();

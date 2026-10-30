@@ -12,7 +12,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,7 +103,7 @@ public class Button {
         this.offItem = offItemStack;
     }
 
-    public Button(boolean defaultState, @NotNull ItemStack onItem, @NotNull ItemStack offItem) {
+    public Button(boolean defaultState, ItemStack onItem, ItemStack offItem) {
         this.flag = defaultState;
         this.compoundTag.putBoolean(RG_CLEAR, true);
 
@@ -139,7 +138,7 @@ public class Button {
         updateButton(container, slot, onItemStack, offItemStack);
     }
 
-    public void updateButton(@NotNull Container container, int slot, @NotNull ItemStack onItemStack, ItemStack offItemStack) {
+    public void updateButton(Container container, int slot, ItemStack onItemStack, ItemStack offItemStack) {
         if (!(
             container.getItem(slot).is(onItemStack.getItem()) ||
                 container.getItem(slot).is(offItemStack.getItem()) ||

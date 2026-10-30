@@ -19,7 +19,6 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.NeoForge;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -28,7 +27,7 @@ public class RollingGateClient {
     public static final ClientRGRuleManager CLIENT_RULE_MANAGER = new ClientRGRuleManager(RollingGate.MODID);
     public static final ServerRGRuleManager CLIENT_SERVER_RULE_MANAGER = new ServerRGRuleManager(RollingGate.MODID);
 
-    public RollingGateClient(@NotNull IEventBus eventBus, @NotNull ModContainer modContainer) throws ClassNotFoundException {
+    public RollingGateClient(IEventBus eventBus, ModContainer modContainer) throws ClassNotFoundException {
         RollingGateClient.CLIENT_SERVER_RULE_MANAGER.compileContent();
         RollingGateClient.CLIENT_RULE_MANAGER.compileContent();
         Map<String, ModConfigSpec> configSpecs = RollingGateClient.CLIENT_RULE_MANAGER.getSpecMap();
@@ -44,24 +43,24 @@ public class RollingGateClient {
     }
 
     @SubscribeEvent
-    public void onLoad(final @NotNull ModConfigEvent event) {
+    public void onLoad(final ModConfigEvent event) {
         RollingGateClient.CLIENT_RULE_MANAGER.reInit();
     }
 
-    public static void onLoaded(final @NotNull ClientLoadedEvent event) {
+    public static void onLoaded(final ClientLoadedEvent event) {
         RollingGateClient.CLIENT_RULE_MANAGER.loadSuccess();
     }
 
-    public static void onLoggingIn(final @NotNull ClientPlayerNetworkEvent.LoggingIn event) {
+    public static void onLoggingIn(final ClientPlayerNetworkEvent.LoggingIn event) {
         ClientPacketDistributor.sendToServer(new ServerRulesHelloPayload());
     }
 
-    public static void onLoggingOut(final @NotNull ClientPlayerNetworkEvent.LoggingOut event) {
+    public static void onLoggingOut(final ClientPlayerNetworkEvent.LoggingOut event) {
         RollingGateClient.CLIENT_SERVER_RULE_MANAGER.resetRulesToDefault();
     }
 
     @SubscribeEvent
-    public <T> void onLoad(final @NotNull RGValidatorNotPassedEvent<T> event) {
+    public <T> void onLoad(final RGValidatorNotPassedEvent<T> event) {
         RollingGateClient.CLIENT_RULE_MANAGER.reInit();
         @SuppressWarnings("unchecked")
         ModConfigSpec.ConfigValue<T> value = (ModConfigSpec.ConfigValue<T>) RollingGateClient.CLIENT_RULE_MANAGER.getConfigValueMap()

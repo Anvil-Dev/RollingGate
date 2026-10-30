@@ -9,10 +9,9 @@ import dev.anvilcraft.rg.RollingGate;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -29,7 +28,7 @@ import java.util.function.Function;
 public abstract class FilesUtil {
     public static final Gson GSON = new GsonBuilder()
         .setPrettyPrinting()
-        .registerTypeHierarchyAdapter(ResourceLocation.class, new ResourceLocationSerializer())
+        .registerTypeHierarchyAdapter(Identifier.class, new ResourceLocationSerializer())
         .registerTypeHierarchyAdapter(ResourceKey.class, new DimTypeSerializer())
         .registerTypeHierarchyAdapter(ChatFormatting.class, new ChatFormattingSerializer())
         .create();
@@ -41,7 +40,7 @@ public abstract class FilesUtil {
         this.rgJson = "%s.rg.json".formatted(jsonPrefix);
     }
 
-    public void init(@NotNull CommandContext<CommandSourceStack> context) {
+    public void init(CommandContext<CommandSourceStack> context) {
         MinecraftServer server1 = context.getSource().getServer();
         this.init(server1);
     }
@@ -50,20 +49,20 @@ public abstract class FilesUtil {
         this.gson = gson;
     }
 
-    public void setGson(@NotNull Consumer<GsonBuilder> gson) {
+    public void setGson(Consumer<GsonBuilder> gson) {
         GsonBuilder builder = new GsonBuilder()
             .setPrettyPrinting()
-            .registerTypeHierarchyAdapter(ResourceLocation.class, new ResourceLocationSerializer())
+            .registerTypeHierarchyAdapter(Identifier.class, new ResourceLocationSerializer())
             .registerTypeHierarchyAdapter(ResourceKey.class, new DimTypeSerializer());
         gson.accept(builder);
         this.gson = builder.create();
     }
 
-    protected abstract void createDefault(@NotNull File file) throws IOException;
+    protected abstract void createDefault(File file) throws IOException;
 
-    protected abstract void init(@NotNull BufferedReader bfr);
+    protected abstract void init(BufferedReader bfr);
 
-    public void init(@NotNull MinecraftServer server1) {
+    public void init(MinecraftServer server1) {
         if (server1 == server) return;
         this.server = server1;
         File file = this.server.getWorldPath(LevelResource.ROOT).resolve(this.rgJson).toFile();
@@ -80,7 +79,7 @@ public abstract class FilesUtil {
         }
     }
 
-    protected abstract void save(@NotNull BufferedWriter bw);
+    protected abstract void save(BufferedWriter bw);
 
     public void save() {
         if (this.server == null) return;
@@ -104,14 +103,14 @@ public abstract class FilesUtil {
         }
 
         @Override
-        protected void createDefault(@NotNull File file) throws IOException {
+        protected void createDefault(File file) throws IOException {
             try (BufferedWriter bw = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
                 this.save(bw);
             }
         }
 
         @Override
-        protected void init(@NotNull BufferedReader bfr) {
+        protected void init(BufferedReader bfr) {
             this.map.clear();
             for (Map.Entry<String, JsonElement> entry : this.gson.fromJson(bfr, JsonObject.class).entrySet()) {
                 this.map.put(keyCodec.apply(entry.getKey()), this.gson.fromJson(entry.getValue(), this.vClass));
@@ -119,7 +118,7 @@ public abstract class FilesUtil {
         }
 
         @Override
-        protected void save(@NotNull BufferedWriter bw) {
+        protected void save(BufferedWriter bw) {
             this.gson.toJson(this.map, bw);
         }
     }
@@ -133,20 +132,20 @@ public abstract class FilesUtil {
         }
 
         @Override
-        protected void createDefault(@NotNull File file) throws IOException {
+        protected void createDefault(File file) throws IOException {
             try (BufferedWriter bw = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
                 this.save(bw);
             }
         }
 
         @Override
-        protected void init(@NotNull BufferedReader bfr) {
+        protected void init(BufferedReader bfr) {
             //noinspection unchecked
             this.obj = (T) this.gson.fromJson(bfr, this.obj.getClass());
         }
 
         @Override
-        protected void save(@NotNull BufferedWriter bw) {
+        protected void save(BufferedWriter bw) {
             this.gson.toJson(this.obj, bw);
         }
     }
