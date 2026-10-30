@@ -146,3 +146,8 @@ lombok {
 tasks.named('jar', Jar) {
     archiveFileName = "${mod_id}-${version}-mc${minecraft_version}.jar"
 }
+
+tasks.withType(Jar).configureEach {
+    archiveBaseName = mod_id
+    archiveVersion = "${version}-mc${minecraft_version}"
+}

@@ -24,7 +24,7 @@ jobs:
         uses: christian-draeger/read-properties@1.1.1
         with:
           path: gradle.properties
-          properties: 'mod_id mod_name java_version'
+          properties: 'mod_id mod_name java_version minecraft_version'
 
       - name: Setup Java ${{ steps.properties.outputs.java_version }}
         uses: actions/setup-java@v3.6.0
@@ -45,20 +45,23 @@ jobs:
       - name: Get Version
         id: version
         run: |
-          MESSAGE=$(ls build/libs/* | grep sources.jar -v | grep shadow.jar -v | grep slim.jar -v | awk -F '${{ steps.properties.outputs.mod_name }}-neoforge-1.21.10|.jar' '{print $2}')
+          JAR=$(find build/libs -maxdepth 1 -name '${{ steps.properties.outputs.mod_id }}-*-mc${{ steps.properties.outputs.minecraft_version }}.jar' -print -quit)
+          MESSAGE=${JAR##*/}
+          MESSAGE=${MESSAGE#${{ steps.properties.outputs.mod_id }}-}
+          MESSAGE=${MESSAGE%-mc${{ steps.properties.outputs.minecraft_version }}.jar}
           echo "version=$MESSAGE" >> $GITHUB_OUTPUT
 
       - name: capture build artifacts
         uses: actions/upload-artifact@v4.3.3
         with:
           name: "${{ steps.properties.outputs.mod_name }} ${{ steps.version.outputs.version }}"
-          path: build/libs/${{ steps.properties.outputs.mod_name }}-neoforge-1.21.10-${{ steps.version.outputs.version }}.jar
+          path: build/libs/${{ steps.properties.outputs.mod_id }}-${{ steps.version.outputs.version }}-mc${{ steps.properties.outputs.minecraft_version }}.jar
 
       - name: Upload Release Jar
         uses: softprops/action-gh-release@v0.1.15
         with:
           files: |
-            build/libs/${{ steps.properties.outputs.mod_name }}-neoforge-1.21.10-${{ steps.version.outputs.version }}.jar
+            build/libs/${{ steps.properties.outputs.mod_id }}-${{ steps.version.outputs.version }}-mc${{ steps.properties.outputs.minecraft_version }}.jar
 
       - name: Publish to maven
         run: ./gradlew publish
@@ -74,7 +77,7 @@ jobs:
         with:
           name: "${{ steps.properties.outputs.mod_name }} For NeoForge v${{ steps.version.outputs.version }}"
           version: ${{ steps.version.outputs.version }}
-          game-versions: 1.21.10
+          game-versions: ${{ steps.properties.outputs.minecraft_version }}
           version-type: ${{ env.VERSION_TYPE }}
           java: 21
           fail-mode: skip
@@ -88,5 +91,5 @@ jobs:
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
 
           files: |
-            build/libs/${{ steps.properties.outputs.mod_name }}-neoforge-1.21.10-${{ steps.version.outputs.version }}.jar
-            build/libs/${{ steps.properties.outputs.mod_name }}-neoforge-1.21.10-${{ steps.version.outputs.version }}-sources.jar
+            build/libs/${{ steps.properties.outputs.mod_id }}-${{ steps.version.outputs.version }}-mc${{ steps.properties.outputs.minecraft_version }}.jar
+            build/libs/${{ steps.properties.outputs.mod_id }}-${{ steps.version.outputs.version }}-mc${{ steps.properties.outputs.minecraft_version }}-sources.jar
