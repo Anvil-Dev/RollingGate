@@ -9,15 +9,11 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 @Mod(RollingGate.MODID)
 public class RollingGate {
@@ -33,15 +29,6 @@ public class RollingGate {
         NeoForge.EVENT_BUS.addListener(RollingGateNetwork::onPlayerLoggedOut);
         NeoForge.EVENT_BUS.addListener(RollingGateNetwork::onServerStopped);
         SERVER_RULE_MANAGER.compileContent();
-        if (FMLEnvironment.dist.isClient()) {
-            Class<?> clientClass = RollingGate.class.getClassLoader().loadClass("dev.anvilcraft.rg.client.RollingGateClient");
-            try {
-                Method setup = clientClass.getMethod("onClientSetup", ModContainer.class);
-                setup.invoke(null, modContainer);
-            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                RollingGate.LOGGER.error(e.getMessage(), e);
-            }
-        }
     }
 
     @SubscribeEvent

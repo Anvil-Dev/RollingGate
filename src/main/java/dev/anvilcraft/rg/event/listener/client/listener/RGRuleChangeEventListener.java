@@ -21,10 +21,11 @@ public class RGRuleChangeEventListener {
     @SubscribeEvent
     public static void onWindowResizableChange(@NotNull RGRuleChangeEvent.Client<Boolean> event) {
         if (!"windowResizable".equals(event.getRule().name())) return;
-        if (event.getNewValue()) {
-            GLFW.glfwSetWindowAttrib(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_RESIZABLE, GLFW.GLFW_TRUE);
-        } else {
-            GLFW.glfwSetWindowAttrib(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_RESIZABLE, GLFW.GLFW_FALSE);
-        }
+        Minecraft minecraft = Minecraft.getInstance();
+        boolean resizable = event.getNewValue();
+        // Config loading can post this event on a mod-loading worker. GLFW window
+        // operations must run on Minecraft's client thread, particularly on macOS.
+        minecraft.execute(() -> GLFW.glfwSetWindowAttrib(minecraft.getWindow().getWindow(),
+            GLFW.GLFW_RESIZABLE, resizable ? GLFW.GLFW_TRUE : GLFW.GLFW_FALSE));
     }
 }
