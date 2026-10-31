@@ -19,6 +19,8 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -41,6 +43,7 @@ public class RollingGateClient {
         NeoForge.EVENT_BUS.addListener(RollingGateClient::onLoaded);
         NeoForge.EVENT_BUS.addListener(RollingGateClient::onLoggingIn);
         NeoForge.EVENT_BUS.addListener(RollingGateClient::onLoggingOut);
+        NeoForge.EVENT_BUS.addListener(RollingGateClient::onIntegratedServerStopped);
     }
 
     @SubscribeEvent
@@ -57,7 +60,24 @@ public class RollingGateClient {
     }
 
     public static void onLoggingOut(final @NotNull ClientPlayerNetworkEvent.LoggingOut event) {
+        var connection = event.getConnection();
+        var server = ServerLifecycleHooks.getCurrentServer();
+        boolean integrated = (connection != null && connection.isMemoryConnection())
+            || (server != null && !server.isDedicatedServer());
+        // Server rules are static fields shared with the integrated server. It
+        // still needs them when saving during its later shutdown event.
+        if (integrated) return;
         RollingGateClient.CLIENT_SERVER_RULE_MANAGER.resetRulesToDefault();
+    }
+
+    public static void onIntegratedServerStopped(final @NotNull ServerStoppedEvent event) {
+        if (event.getServer().isDedicatedServer()) return;
+        net.minecraft.client.Minecraft.getInstance().execute(() -> {
+            // Do not overwrite rules already applied by a newly connected server.
+            if (net.minecraft.client.Minecraft.getInstance().getConnection() == null) {
+                CLIENT_SERVER_RULE_MANAGER.resetRulesToDefault();
+            }
+        });
     }
 
     @SubscribeEvent
