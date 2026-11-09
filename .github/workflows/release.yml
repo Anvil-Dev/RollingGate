@@ -79,7 +79,7 @@ jobs:
           version: ${{ steps.version.outputs.version }}
           game-versions: ${{ steps.properties.outputs.minecraft_version }}
           version-type: ${{ env.VERSION_TYPE }}
-          java: 21
+          java: 25
           fail-mode: skip
           changelog: ${{ github.event.release.body }}
 

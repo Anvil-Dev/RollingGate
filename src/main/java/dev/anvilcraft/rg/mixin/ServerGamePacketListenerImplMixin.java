@@ -19,7 +19,7 @@ public abstract class ServerGamePacketListenerImplMixin {
     public abstract ServerPlayer getPlayer();
 
     @Inject(
-        method = "lambda$handleChat$6",
+        method = "lambda$handleChat$1",
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;broadcastChatMessage(Lnet/minecraft/network/chat/PlayerChatMessage;)V",

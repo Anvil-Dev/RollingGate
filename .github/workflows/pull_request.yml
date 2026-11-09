@@ -65,6 +65,6 @@ jobs:
           path: build/libs/${{ steps.properties.outputs.mod_id }}-${{ steps.version.outputs.version }}-mc${{ steps.properties.outputs.minecraft_version }}.jar
 
       - name: gametest
-        uses: Anvil-Dev/dedicated-server-launch-test@1.21.11-neoforge
+        uses: Anvil-Dev/dedicated-server-launch-test@26.1.2-neoforge
         with:
-          mod: build/libs/${{ steps.properties.outputs.mod_id }}-${{ steps.version.outputs.version }}-mc${{ steps.properties.outputs.minecraft_version }}.jar
+          mods: build/libs/${{ steps.properties.outputs.mod_id }}-${{ steps.version.outputs.version }}-mc${{ steps.properties.outputs.minecraft_version }}.jar
